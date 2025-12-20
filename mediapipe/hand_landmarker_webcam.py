@@ -1,23 +1,145 @@
 import urllib
 import pathlib
 
+import dataclasses
+from typing import Iterable, Mapping, Optional, Sequence, Tuple, Union
+
 import numpy as np
 
 import cv2
 
 import mediapipe as mp
-from mediapipe.framework.formats import landmark_pb2
-from mediapipe.tasks.python.core import base_options as base_options_module
 from mediapipe.tasks.python import vision
+from mediapipe.tasks.python.core import base_options as base_options_module
 
-# Constants
+# Drawing constants
+WHITE_COLOR = (224, 224, 224)
+BLACK_COLOR = (0, 0, 0)
+RED_COLOR = (0, 0, 255)
+GREEN_COLOR = (0, 128, 0)
+BLUE_COLOR = (255, 0, 0)
+_BGR_CHANNELS = 3
+_VISIBILITY_THRESHOLD = 0.5
+_PRESENCE_THRESHOLD = 0.5
+
+# Text overlay constants
 MARGIN = 10  # pixels
 FONT_SIZE = 2
 FONT_THICKNESS = 2
 HANDEDNESS_TEXT_COLOR = (88, 205, 54)  # vibrant green
 
+# Hand connections (mirrors mediapipe.solutions.hands.HAND_CONNECTIONS)
+HAND_CONNECTIONS = frozenset([
+    (0, 1), (1, 2), (2, 3), (3, 4),
+    (0, 5), (5, 6), (6, 7), (7, 8),
+    (5, 9), (9, 10), (10, 11), (11, 12),
+    (9, 13), (13, 14), (14, 15), (15, 16),
+    (13, 17), (17, 18), (18, 19), (19, 20),
+    (0, 17),
+])
+
+
+@dataclasses.dataclass
+class DrawingSpec:
+    """Drawing style spec."""
+
+    color: Tuple[int, int, int] = WHITE_COLOR
+    thickness: int = 2
+    circle_radius: int = 2
+
+
+def _normalized_to_pixel_coordinates(
+    normalized_x: float, normalized_y: float, image_width: int, image_height: int
+) -> Optional[Tuple[int, int]]:
+    """Converts normalized value pair to pixel coordinates."""
+    clamped_x = min(max(normalized_x, 0.0), 1.0)
+    clamped_y = min(max(normalized_y, 0.0), 1.0)
+    x_px = min(int(np.floor(clamped_x * image_width)), image_width - 1)
+    y_px = min(int(np.floor(clamped_y * image_height)), image_height - 1)
+    return (x_px, y_px)
+
+
+def draw_landmarks(
+    image: np.ndarray,
+    landmark_list: Sequence,
+    connections: Optional[Iterable[Tuple[int, int]]] = None,
+    landmark_drawing_spec: Optional[
+        Union[DrawingSpec, Mapping[int, DrawingSpec]]
+    ] = DrawingSpec(color=RED_COLOR),
+    connection_drawing_spec: Union[
+        DrawingSpec, Mapping[Tuple[int, int], DrawingSpec]
+    ] = DrawingSpec(),
+    is_drawing_landmarks: bool = True,
+):
+    """Draws landmarks and connections (adapted from mediapipe drawing_utils)."""
+    if not landmark_list:
+        return
+    if image.shape[2] != _BGR_CHANNELS:
+        raise ValueError("Input image must contain three channel bgr data.")
+    image_rows, image_cols, _ = image.shape
+    idx_to_coordinates = {}
+    for idx, landmark in enumerate(landmark_list):
+        visibility = getattr(landmark, "visibility", 1.0) or 1.0
+        presence = getattr(landmark, "presence", 1.0) or 1.0
+        if visibility < _VISIBILITY_THRESHOLD or presence < _PRESENCE_THRESHOLD:
+            continue
+        landmark_px = _normalized_to_pixel_coordinates(
+            landmark.x, landmark.y, image_cols, image_rows
+        )
+        if landmark_px:
+            idx_to_coordinates[idx] = landmark_px
+
+    if connections:
+        num_landmarks = len(landmark_list)
+        for connection in connections:
+            start_idx, end_idx = connection
+            if not (0 <= start_idx < num_landmarks and 0 <= end_idx < num_landmarks):
+                raise ValueError(
+                    f"Landmark index is out of range. Invalid connection from landmark "
+                    f"#{start_idx} to landmark #{end_idx}."
+                )
+            if start_idx in idx_to_coordinates and end_idx in idx_to_coordinates:
+                drawing_spec = (
+                    connection_drawing_spec[connection]
+                    if isinstance(connection_drawing_spec, Mapping)
+                    else connection_drawing_spec
+                )
+                cv2.line(
+                    image,
+                    idx_to_coordinates[start_idx],
+                    idx_to_coordinates[end_idx],
+                    drawing_spec.color,
+                    drawing_spec.thickness,
+                )
+
+    if is_drawing_landmarks and landmark_drawing_spec:
+        for idx, landmark_px in idx_to_coordinates.items():
+            drawing_spec = (
+                landmark_drawing_spec[idx]
+                if isinstance(landmark_drawing_spec, Mapping)
+                else landmark_drawing_spec
+            )
+            circle_border_radius = max(
+                drawing_spec.circle_radius + 1,
+                int(drawing_spec.circle_radius * 1.2),
+            )
+            cv2.circle(
+                image,
+                landmark_px,
+                circle_border_radius,
+                WHITE_COLOR,
+                drawing_spec.thickness,
+            )
+            cv2.circle(
+                image,
+                landmark_px,
+                drawing_spec.circle_radius,
+                drawing_spec.color,
+                drawing_spec.thickness,
+            )
+
 # Path to the model file
-model_path = pathlib.Path("hand_landmarker.task")
+model_path = pathlib.Path("models/hand_landmarker.task")
 
 # Check if the model file exists, if not, download it
 if not model_path.exists():
@@ -28,7 +150,7 @@ if not model_path.exists():
     print(f"Model downloaded and saved as {model_path}")
 
 # Initialize MediaPipe HandLandmarker
-base_options = base_options_module.BaseOptions(model_asset_path=model_path)
+base_options = base_options_module.BaseOptions(model_asset_path=str(model_path))
 options = vision.HandLandmarkerOptions(base_options=base_options, num_hands=2)
 detector = vision.HandLandmarker.create_from_options(options)
 
@@ -47,23 +169,12 @@ def draw_landmarks_on_image(rgb_image, detection_result):
             "Right" if handedness[0].category_name == "Left" else "Left"
         )
 
-        # Draw hand landmarks
-        hand_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
-        hand_landmarks_proto.landmark.extend(
-            [
-                landmark_pb2.NormalizedLandmark(
-                    x=landmark.x, y=landmark.y, z=landmark.z
-                )
-                for landmark in hand_landmarks
-            ]
-        )
-        # source code here: https://github.com/google-ai-edge/mediapipe/blob/e5067b2134fa28e4c248aa482ef18ac57afb9d58/mediapipe/python/solutions/drawing_utils.py#L119
-        mp.solutions.drawing_utils.draw_landmarks(
-            annotated_image,
-            hand_landmarks_proto,
-            mp.solutions.hands.HAND_CONNECTIONS,
-            mp.solutions.drawing_styles.get_default_hand_landmarks_style(),
-            mp.solutions.drawing_styles.get_default_hand_connections_style(),
+        draw_landmarks(
+            image=annotated_image,
+            landmark_list=hand_landmarks,
+            connections=HAND_CONNECTIONS,
+            landmark_drawing_spec=DrawingSpec(color=GREEN_COLOR, thickness=2, circle_radius=2),
+            connection_drawing_spec=DrawingSpec(color=BLUE_COLOR, thickness=2, circle_radius=0),
         )
 
         # Get the top left corner of the detected hand's bounding box
@@ -89,7 +200,7 @@ def draw_landmarks_on_image(rgb_image, detection_result):
 
 
 # Open webcam video stream
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 while cap.isOpened():
     ret, frame = cap.read()
