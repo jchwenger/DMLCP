@@ -527,6 +527,7 @@ def get_default_face_mesh_tesselation_style():
   return DrawingSpec(color=(192, 192, 192), thickness=1, circle_radius=0)
 
 
+# https://github.com/google-ai-edge/mediapipe/blob/9e4f898b22cf445c0ba7edc81ab4eb669fd71e89/mediapipe/python/solutions/drawing_styles.py#L182
 def get_default_face_mesh_contours_style():
   """Default style for face mesh contours (green outlines)."""
   return DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=0)
