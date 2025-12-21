@@ -36,7 +36,7 @@ const trackingConfig = {
   doAcquireHandGesture: !true, //comes with landmarks & gestures
   doAcquirePoseLandmarks: !true,
   doAcquireFaceLandmarks: !true,
-  doAcquireFaceMetrics: !true,
+  doAcquireFaceMetrics: !true, // use with doAcquireFaceLandmarks
   poseModelLiteOrFull: "lite", /* "lite" (3MB) or "full" (6MB) */
   cpuOrGpuString: "GPU", /* "GPU" or "CPU" */
   maxNumHands: 2,
