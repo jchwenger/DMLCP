@@ -1,7 +1,15 @@
+# --------------------------------------------------------------------------------
+# Commands:
+#   - '1' to toggle pose segmentation mask
+#     (0: no mask, 1: mask only, 2: mask with transparency)
+# --------------------------------------------------------------------------------
+
 import urllib
 import pathlib
 import dataclasses
-from typing import Iterable, Mapping, Optional, Sequence, Tuple, Union
+
+from typing import Tuple
+from typing import Mapping
 
 import numpy as np
 
@@ -10,6 +18,12 @@ import cv2
 import mediapipe as mp
 from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.core import base_options as base_options_module
+
+# Segmentation mask display modes
+# 0: No mask, 1: Transparent overlay, 2: Only mask
+segmentation_mode = 0
+
+# --------------------------------------------------------------------------------
 
 # Drawing constants
 WHITE_COLOR = (224, 224, 224)
@@ -21,15 +35,48 @@ _VISIBILITY_THRESHOLD = 0.5
 _PRESENCE_THRESHOLD = 0.5
 
 # https://github.com/google-ai-edge/mediapipe/blob/9e4f898b22cf445c0ba7edc81ab4eb669fd71e89/mediapipe/python/solutions/pose_connections.py#L16
-POSE_CONNECTIONS = frozenset([(0, 1), (1, 2), (2, 3), (3, 7), (0, 4), (4, 5),
-                              (5, 6), (6, 8), (9, 10), (11, 12), (11, 13),
-                              (13, 15), (15, 17), (15, 19), (15, 21), (17, 19),
-                              (12, 14), (14, 16), (16, 18), (16, 20), (16, 22),
-                              (18, 20), (11, 23), (12, 24), (23, 24), (23, 25),
-                              (24, 26), (25, 27), (26, 28), (27, 29), (28, 30),
-                              (29, 31), (30, 32), (27, 31), (28, 32)])
+POSE_CONNECTIONS = frozenset(
+    [
+        (0, 1),
+        (1, 2),
+        (2, 3),
+        (3, 7),
+        (0, 4),
+        (4, 5),
+        (5, 6),
+        (6, 8),
+        (9, 10),
+        (11, 12),
+        (11, 13),
+        (13, 15),
+        (15, 17),
+        (15, 19),
+        (15, 21),
+        (17, 19),
+        (12, 14),
+        (14, 16),
+        (16, 18),
+        (16, 20),
+        (16, 22),
+        (18, 20),
+        (11, 23),
+        (12, 24),
+        (23, 24),
+        (23, 25),
+        (24, 26),
+        (25, 27),
+        (26, 28),
+        (27, 29),
+        (28, 30),
+        (29, 31),
+        (30, 32),
+        (27, 31),
+        (28, 32),
+    ]
+)
 
 
+# https://github.com/google-ai-edge/mediapipe/blob/9e4f898b22cf445c0ba7edc81ab4eb669fd71e89/mediapipe/python/solutions/drawing_utils.py#L39
 @dataclasses.dataclass
 class DrawingSpec:
     """Drawing style spec."""
@@ -40,8 +87,8 @@ class DrawingSpec:
 
 
 def _normalized_to_pixel_coordinates(
-    normalized_x: float, normalized_y: float, image_width: int, image_height: int
-) -> Optional[Tuple[int, int]]:
+    normalized_x, normalized_y, image_width: int, image_height: int
+):
     """Converts normalized value pair to pixel coordinates."""
     clamped_x = min(max(normalized_x, 0.0), 1.0)
     clamped_y = min(max(normalized_y, 0.0), 1.0)
@@ -50,19 +97,39 @@ def _normalized_to_pixel_coordinates(
     return (x_px, y_px)
 
 
+# https://github.com/google-ai-edge/mediapipe/blob/9e4f898b22cf445c0ba7edc81ab4eb669fd71e89/mediapipe/python/solutions/drawing_utils.py#L119
 def draw_landmarks(
-    image: np.ndarray,
-    landmark_list: Sequence,
-    connections: Optional[Iterable[Tuple[int, int]]] = None,
-    landmark_drawing_spec: Optional[
-        Union[DrawingSpec, Mapping[int, DrawingSpec]]
-    ] = DrawingSpec(color=GREEN_COLOR),
-    connection_drawing_spec: Union[
-        DrawingSpec, Mapping[Tuple[int, int], DrawingSpec]
-    ] = DrawingSpec(),
-    is_drawing_landmarks: bool = True,
+    image,
+    landmark_list,
+    connections=None,
+    landmark_drawing_spec=DrawingSpec(color=GREEN_COLOR),
+    connection_drawing_spec=DrawingSpec(color=BLUE_COLOR, thickness=2, circle_radius=0),
+    is_drawing_landmarks=True,
 ):
-    """Draws landmarks and connections (adapted from mediapipe drawing_utils)."""
+    """Draws the landmarks and the connections on the image.
+
+    Args:
+      image: A three channel BGR image represented as numpy ndarray.
+      landmark_list: A normalized landmark list proto message to be annotated on
+        the image.
+      connections: A list of landmark index tuples that specifies how landmarks to
+        be connected in the drawing.
+      landmark_drawing_spec: Either a DrawingSpec object or a mapping from hand
+        landmarks to the DrawingSpecs that specifies the landmarks' drawing
+        settings such as color, line thickness, and circle radius. If this
+        argument is explicitly set to None, no landmarks will be drawn.
+      connection_drawing_spec: Either a DrawingSpec object or a mapping from hand
+        connections to the DrawingSpecs that specifies the connections' drawing
+        settings such as color and line thickness. If this argument is explicitly
+        set to None, no landmark connections will be drawn.
+      is_drawing_landmarks: Whether to draw landmarks. If set false, skip drawing
+        landmarks, only contours will be drawed.
+
+    Raises:
+      ValueError: If one of the followings:
+        a) If the input image is not three channel BGR.
+        b) If any connetions contain invalid landmark index.
+    """
     if not landmark_list:
         return
     if image.shape[2] != _BGR_CHANNELS:
@@ -82,6 +149,7 @@ def draw_landmarks(
 
     if connections:
         num_landmarks = len(landmark_list)
+        # Draws the connections if the start and end landmarks are both visible.
         for connection in connections:
             start_idx, end_idx = connection
             if not (0 <= start_idx < num_landmarks and 0 <= end_idx < num_landmarks):
@@ -103,6 +171,8 @@ def draw_landmarks(
                     drawing_spec.thickness,
                 )
 
+    # Draws landmark points after finishing the connection lines, which is
+    # aesthetically better.
     if is_drawing_landmarks and landmark_drawing_spec:
         for idx, landmark_px in idx_to_coordinates.items():
             drawing_spec = (
@@ -110,6 +180,7 @@ def draw_landmarks(
                 if isinstance(landmark_drawing_spec, Mapping)
                 else landmark_drawing_spec
             )
+            # White circle border
             circle_border_radius = max(
                 drawing_spec.circle_radius + 1,
                 int(drawing_spec.circle_radius * 1.2),
@@ -121,6 +192,7 @@ def draw_landmarks(
                 WHITE_COLOR,
                 drawing_spec.thickness,
             )
+            # Fill color into the circle
             cv2.circle(
                 image,
                 landmark_px,
@@ -153,6 +225,8 @@ def draw_landmarks_on_image(bgr_image, detection_result):
     return annotated_image
 
 
+# --------------------------------------------------------------------------------
+
 # Path to the model file
 model_path = pathlib.Path("models/pose_landmarker.task")
 model_path.parent.mkdir(exist_ok=True)
@@ -171,8 +245,7 @@ options = vision.PoseLandmarkerOptions(
 )
 detector = vision.PoseLandmarker.create_from_options(options)
 
-# Segmentation mask display modes
-segmentation_mode = 0  # 0: No mask, 1: Transparent overlay, 2: Only mask
+# --------------------------------------------------------------------------------
 
 # Open webcam video stream
 cap = cv2.VideoCapture(1)
@@ -203,7 +276,9 @@ while cap.isOpened():
         frame_h, frame_w = annotated_frame.shape[:2]
         mask_8u = (segmentation_mask * 255).astype(np.uint8)
         if mask_8u.shape[:2] != (frame_h, frame_w):
-            mask_8u = cv2.resize(mask_8u, (frame_w, frame_h), interpolation=cv2.INTER_LINEAR)
+            mask_8u = cv2.resize(
+                mask_8u, (frame_w, frame_h), interpolation=cv2.INTER_LINEAR
+            )
         # Expand to 3 channels for blending or display.
         mask_rgb = np.repeat(mask_8u[:, :], 3, axis=2)
 
