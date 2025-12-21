@@ -1,7 +1,7 @@
 # --------------------------------------------------------------------------------
 # Commands:
-#   - '1' to toggle foreground mask 
-#   - '2' to toggle background mask 
+#   - '1' to toggle foreground mask
+#   - '2' to toggle background mask
 #     (0: no mask, 1: mask only, 2: mask with transparency)
 # --------------------------------------------------------------------------------
 
@@ -18,15 +18,22 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.components import containers
 
+# Variables to control transparency
+# 0: no mask, 1: mask only, 2: mask with transparency
+foreground_display_mode = 0
+background_display_mode = 0
+
+# Default initial selection point
+keypoint_x, keypoint_y = 0.5, 0.5
+
+# --------------------------------------------------------------------------------
+
 # Constants for segmentation
 BG_COLOR = (255, 0, 255)  # magenta
 FG_COLOR = (0, 255, 255)  # cyan
 RegionOfInterest = vision.InteractiveSegmenterRegionOfInterest
 NormalizedKeypoint = containers.keypoint.NormalizedKeypoint
 
-# Variables to control transparency
-foreground_display_mode = 0  # 0: no mask, 1: mask only, 2: mask with transparency
-background_display_mode = 0  # 0: no mask, 1: mask only, 2: mask with transparency
 
 # Function to convert normalized coordinates to pixel coordinates
 def _normalized_to_pixel_coordinates(
@@ -36,6 +43,15 @@ def _normalized_to_pixel_coordinates(
     y_px = min(math.floor(normalized_y * image_height), image_height - 1)
     return x_px, y_px
 
+
+# Callback function to select point on mouse click
+def click_event(event, x, y, flags, param):
+    global keypoint_x, keypoint_y
+    if event == cv2.EVENT_LBUTTONDOWN:
+        keypoint_x, keypoint_y = x / param[0], y / param[1]
+
+
+# --------------------------------------------------------------------------------
 
 # Path to the model file
 model_path = pathlib.Path("models/interactive_segmenter.tflite")
@@ -55,14 +71,7 @@ options = vision.InteractiveSegmenterOptions(
 )
 segmenter = vision.InteractiveSegmenter.create_from_options(options)
 
-# Callback function to select point on mouse click
-keypoint_x, keypoint_y = 0.5, 0.5  # Default initial point
-
-
-def click_event(event, x, y, flags, param):
-    global keypoint_x, keypoint_y
-    if event == cv2.EVENT_LBUTTONDOWN:
-        keypoint_x, keypoint_y = x / param[0], y / param[1]
+# --------------------------------------------------------------------------------
 
 # Open webcam video stream
 cap = cv2.VideoCapture(1)
