@@ -1,7 +1,7 @@
 import time
-import urllib
 import pathlib
 import argparse
+import urllib.request
 
 import numpy as np
 
@@ -19,6 +19,9 @@ FONT_THICKNESS = 2
 RECT_COLOR = (255, 0, 0)  # blue (BGR)
 TEXT_COLOR = (255, 255, 255)  # white
 FPS_AVG_FRAME_COUNT = 10
+
+DEFAULT_MODEL_PATH = pathlib.Path("models/efficientdet.tflite")
+DEFAULT_MODEL_URL = "https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/int8/1/efficientdet.tflite"
 
 def visualize(image, detection_result) -> np.ndarray:
     """Draws bounding boxes on the input image and return it.
@@ -56,11 +59,15 @@ def visualize(image, detection_result) -> np.ndarray:
     return image
 
 
-def download(url, model_path):
-    print()
-    print(f"Downloading model from {url}...")
-    urllib.request.urlretrieve(url, model_path)
-    print(f"Model downloaded and saved as {model_path}")
+def ensure_model(model_path: pathlib.Path, url: str) -> pathlib.Path:
+    """Ensure the model file exists locally; download it if missing."""
+    model_path.parent.mkdir(exist_ok=True)
+    if not model_path.exists():
+        print()
+        print(f"Downloading model from {url}...")
+        urllib.request.urlretrieve(url, model_path)
+        print(f"Model downloaded and saved as {model_path}")
+    return model_path
 
 
 def show_fps(
@@ -94,9 +101,7 @@ def run(args):
       args.frame_height: The height of the frame captured from the camera.
     """
 
-    # Check if the model file exists, if not, download it
-    if not args.model.exists():
-        download(args.url, args.model)
+    model_path = ensure_model(args.model, args.url)
 
     detection_result_list = []
 
@@ -107,7 +112,7 @@ def run(args):
         detection_result_list.append(result)
 
     # Initialize ObjectDetector
-    base_options = python.BaseOptions(model_asset_path=args.model)
+    base_options = python.BaseOptions(model_asset_path=str(model_path))
     options = vision.ObjectDetectorOptions(
         base_options=base_options,
         running_mode=vision.RunningMode.LIVE_STREAM,
@@ -187,7 +192,7 @@ if __name__ == "__main__":
         script will attempt to download it from the default url.
         """,
         required=False,
-        default="efficientdet.tflite",
+        default=str(DEFAULT_MODEL_PATH),
     )
 
     parser.add_argument(
@@ -196,11 +201,11 @@ if __name__ == "__main__":
         https://ai.google.dev/edge/mediapipe/solutions
         """,
         required=False,
-        default="https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/int8/1/efficientdet_lite0.tflite",
+        default=DEFAULT_MODEL_URL,
     )
 
     parser.add_argument(
-        "--camera_id", help="Id of camera.", required=False, type=int, default=0
+        "--camera_id", help="Id of camera.", required=False, type=int, default=1
     )
 
     parser.add_argument(
