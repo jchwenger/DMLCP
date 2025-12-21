@@ -38,7 +38,7 @@ def _normalized_to_pixel_coordinates(
 
 
 # Path to the model file
-model_path = pathlib.Path("interactive_segmenter.tflite")
+model_path = pathlib.Path("models/interactive_segmenter.tflite")
 
 # Check if the model file exists, if not, download it
 if not model_path.exists():
@@ -49,8 +49,8 @@ if not model_path.exists():
     print(f"Model downloaded and saved as {model_path}")
 
 # Initialize ImageSegmenter
-base_options = python.BaseOptions(model_asset_path=model_path)
-options = vision.ImageSegmenterOptions(
+base_options = python.BaseOptions(model_asset_path=str(model_path))
+options = vision.InteractiveSegmenterOptions(
     base_options=base_options, output_category_mask=True
 )
 segmenter = vision.InteractiveSegmenter.create_from_options(options)
@@ -65,7 +65,7 @@ def click_event(event, x, y, flags, param):
         keypoint_x, keypoint_y = x / param[0], y / param[1]
 
 # Open webcam video stream
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 while cap.isOpened():
     ret, frame = cap.read()
@@ -89,8 +89,11 @@ while cap.isOpened():
     segmentation_result = segmenter.segment(mp_image, roi)
     category_mask = segmentation_result.category_mask
 
-    # Convert mask to a boolean condition
-    condition = np.stack((category_mask.numpy_view(),) * 3, axis=-1) > 0.1
+    # Convert mask to a boolean condition with same channel shape as the image
+    mask = category_mask.numpy_view()
+    if mask.ndim == 2:  # ensure channel dimension exists
+        mask = np.expand_dims(mask, axis=-1)
+    condition = np.repeat(mask, 3, axis=2) > 0.1
 
     # Prepare the foreground (cyan) and background (magenta) overlays
     fg_overlay = np.zeros(rgb_frame.shape, dtype=np.uint8)
