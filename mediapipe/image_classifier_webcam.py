@@ -29,7 +29,8 @@ def resize_frame(image):
 
 
 # Path to the model file
-model_path = pathlib.Path("classifier.tflite")
+model_path = pathlib.Path("models/classifier.tflite")
+model_path.parent.mkdir(exist_ok=True)
 
 # Check if the model file exists, if not, download it
 if not model_path.exists():
@@ -40,12 +41,12 @@ if not model_path.exists():
     print(f"Model downloaded and saved as {model_path}")
 
 # Initialize MediaPipe ImageClassifier
-base_options = base_options_module.BaseOptions(model_asset_path="classifier.tflite")
+base_options = base_options_module.BaseOptions(model_asset_path=str(model_path))
 options = vision.ImageClassifierOptions(base_options=base_options, max_results=4)
 classifier = vision.ImageClassifier.create_from_options(options)
 
 # Open webcam video stream
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 while cap.isOpened():
     ret, frame = cap.read()
