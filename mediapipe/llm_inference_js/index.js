@@ -89,7 +89,7 @@ async function runDemo() {
       })
       .catch((e) => {
         console.log(e);
-        alert('Failed to initialize the task.');
+        alert('Failed to initialize the task. Are you in Chrome?');
       });
 }
 
