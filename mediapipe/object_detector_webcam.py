@@ -16,6 +16,8 @@ import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
+# --------------------------------------------------------------------------------
+
 # Constants for drawing
 MARGIN = 30  # pixels
 ROW_SIZE = 30  # pixels

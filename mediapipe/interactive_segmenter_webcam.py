@@ -18,6 +18,10 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.components import containers
 
+from utils import _normalized_to_pixel_coordinates
+
+# --------------------------------------------------------------------------------
+
 # Variables to control transparency
 # 0: no mask, 1: mask only, 2: mask with transparency
 foreground_display_mode = 0
@@ -26,22 +30,12 @@ background_display_mode = 0
 # Default initial selection point
 keypoint_x, keypoint_y = 0.5, 0.5
 
-# --------------------------------------------------------------------------------
-
 # Constants for segmentation
 BG_COLOR = (255, 0, 255)  # magenta
 FG_COLOR = (0, 255, 255)  # cyan
+
 RegionOfInterest = vision.InteractiveSegmenterRegionOfInterest
 NormalizedKeypoint = containers.keypoint.NormalizedKeypoint
-
-
-# Function to convert normalized coordinates to pixel coordinates
-def _normalized_to_pixel_coordinates(
-    normalized_x, normalized_y, image_width, image_height
-):
-    x_px = min(math.floor(normalized_x * image_width), image_width - 1)
-    y_px = min(math.floor(normalized_y * image_height), image_height - 1)
-    return x_px, y_px
 
 
 # Callback function to select point on mouse click

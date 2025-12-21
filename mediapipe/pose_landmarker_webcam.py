@@ -19,11 +19,15 @@ import mediapipe as mp
 from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.core import base_options as base_options_module
 
+from utils import DrawingSpec
+from utils import draw_landmarks
+
+# --------------------------------------------------------------------------------
+
 # Segmentation mask display modes
 # 0: No mask, 1: Transparent overlay, 2: Only mask
 segmentation_mode = 0
 
-# --------------------------------------------------------------------------------
 
 # Drawing constants
 WHITE_COLOR = (224, 224, 224)
@@ -35,171 +39,15 @@ _VISIBILITY_THRESHOLD = 0.5
 _PRESENCE_THRESHOLD = 0.5
 
 # https://github.com/google-ai-edge/mediapipe/blob/9e4f898b22cf445c0ba7edc81ab4eb669fd71e89/mediapipe/python/solutions/pose_connections.py#L16
-POSE_CONNECTIONS = frozenset(
-    [
-        (0, 1),
-        (1, 2),
-        (2, 3),
-        (3, 7),
-        (0, 4),
-        (4, 5),
-        (5, 6),
-        (6, 8),
-        (9, 10),
-        (11, 12),
-        (11, 13),
-        (13, 15),
-        (15, 17),
-        (15, 19),
-        (15, 21),
-        (17, 19),
-        (12, 14),
-        (14, 16),
-        (16, 18),
-        (16, 20),
-        (16, 22),
-        (18, 20),
-        (11, 23),
-        (12, 24),
-        (23, 24),
-        (23, 25),
-        (24, 26),
-        (25, 27),
-        (26, 28),
-        (27, 29),
-        (28, 30),
-        (29, 31),
-        (30, 32),
-        (27, 31),
-        (28, 32),
-    ]
-)
-
-
-# https://github.com/google-ai-edge/mediapipe/blob/9e4f898b22cf445c0ba7edc81ab4eb669fd71e89/mediapipe/python/solutions/drawing_utils.py#L39
-@dataclasses.dataclass
-class DrawingSpec:
-    """Drawing style spec."""
-
-    color: Tuple[int, int, int] = WHITE_COLOR
-    thickness: int = 2
-    circle_radius: int = 2
-
-
-def _normalized_to_pixel_coordinates(
-    normalized_x, normalized_y, image_width: int, image_height: int
-):
-    """Converts normalized value pair to pixel coordinates."""
-    clamped_x = min(max(normalized_x, 0.0), 1.0)
-    clamped_y = min(max(normalized_y, 0.0), 1.0)
-    x_px = min(int(np.floor(clamped_x * image_width)), image_width - 1)
-    y_px = min(int(np.floor(clamped_y * image_height)), image_height - 1)
-    return (x_px, y_px)
-
-
-# https://github.com/google-ai-edge/mediapipe/blob/9e4f898b22cf445c0ba7edc81ab4eb669fd71e89/mediapipe/python/solutions/drawing_utils.py#L119
-def draw_landmarks(
-    image,
-    landmark_list,
-    connections=None,
-    landmark_drawing_spec=DrawingSpec(color=GREEN_COLOR),
-    connection_drawing_spec=DrawingSpec(color=BLUE_COLOR, thickness=2, circle_radius=0),
-    is_drawing_landmarks=True,
-):
-    """Draws the landmarks and the connections on the image.
-
-    Args:
-      image: A three channel BGR image represented as numpy ndarray.
-      landmark_list: A normalized landmark list proto message to be annotated on
-        the image.
-      connections: A list of landmark index tuples that specifies how landmarks to
-        be connected in the drawing.
-      landmark_drawing_spec: Either a DrawingSpec object or a mapping from hand
-        landmarks to the DrawingSpecs that specifies the landmarks' drawing
-        settings such as color, line thickness, and circle radius. If this
-        argument is explicitly set to None, no landmarks will be drawn.
-      connection_drawing_spec: Either a DrawingSpec object or a mapping from hand
-        connections to the DrawingSpecs that specifies the connections' drawing
-        settings such as color and line thickness. If this argument is explicitly
-        set to None, no landmark connections will be drawn.
-      is_drawing_landmarks: Whether to draw landmarks. If set false, skip drawing
-        landmarks, only contours will be drawed.
-
-    Raises:
-      ValueError: If one of the followings:
-        a) If the input image is not three channel BGR.
-        b) If any connetions contain invalid landmark index.
-    """
-    if not landmark_list:
-        return
-    if image.shape[2] != _BGR_CHANNELS:
-        raise ValueError("Input image must contain three channel bgr data.")
-    image_rows, image_cols, _ = image.shape
-    idx_to_coordinates = {}
-    for idx, landmark in enumerate(landmark_list):
-        visibility = getattr(landmark, "visibility", 1.0) or 1.0
-        presence = getattr(landmark, "presence", 1.0) or 1.0
-        if visibility < _VISIBILITY_THRESHOLD or presence < _PRESENCE_THRESHOLD:
-            continue
-        landmark_px = _normalized_to_pixel_coordinates(
-            landmark.x, landmark.y, image_cols, image_rows
-        )
-        if landmark_px:
-            idx_to_coordinates[idx] = landmark_px
-
-    if connections:
-        num_landmarks = len(landmark_list)
-        # Draws the connections if the start and end landmarks are both visible.
-        for connection in connections:
-            start_idx, end_idx = connection
-            if not (0 <= start_idx < num_landmarks and 0 <= end_idx < num_landmarks):
-                raise ValueError(
-                    f"Landmark index is out of range. Invalid connection from landmark "
-                    f"#{start_idx} to landmark #{end_idx}."
-                )
-            if start_idx in idx_to_coordinates and end_idx in idx_to_coordinates:
-                drawing_spec = (
-                    connection_drawing_spec[connection]
-                    if isinstance(connection_drawing_spec, Mapping)
-                    else connection_drawing_spec
-                )
-                cv2.line(
-                    image,
-                    idx_to_coordinates[start_idx],
-                    idx_to_coordinates[end_idx],
-                    drawing_spec.color,
-                    drawing_spec.thickness,
-                )
-
-    # Draws landmark points after finishing the connection lines, which is
-    # aesthetically better.
-    if is_drawing_landmarks and landmark_drawing_spec:
-        for idx, landmark_px in idx_to_coordinates.items():
-            drawing_spec = (
-                landmark_drawing_spec[idx]
-                if isinstance(landmark_drawing_spec, Mapping)
-                else landmark_drawing_spec
-            )
-            # White circle border
-            circle_border_radius = max(
-                drawing_spec.circle_radius + 1,
-                int(drawing_spec.circle_radius * 1.2),
-            )
-            cv2.circle(
-                image,
-                landmark_px,
-                circle_border_radius,
-                WHITE_COLOR,
-                drawing_spec.thickness,
-            )
-            # Fill color into the circle
-            cv2.circle(
-                image,
-                landmark_px,
-                drawing_spec.circle_radius,
-                drawing_spec.color,
-                drawing_spec.thickness,
-            )
+# fmt: off
+POSE_CONNECTIONS = frozenset([(0, 1), (1, 2), (2, 3), (3, 7), (0, 4), (4, 5),
+                              (5, 6), (6, 8), (9, 10), (11, 12), (11, 13),
+                              (13, 15), (15, 17), (15, 19), (15, 21), (17, 19),
+                              (12, 14), (14, 16), (16, 18), (16, 20), (16, 22),
+                              (18, 20), (11, 23), (12, 24), (23, 24), (23, 25),
+                              (24, 26), (25, 27), (26, 28), (27, 29), (28, 30),
+                              (29, 31), (30, 32), (27, 31), (28, 32)])
+# fmt: on
 
 
 # Function to draw landmarks on the image
