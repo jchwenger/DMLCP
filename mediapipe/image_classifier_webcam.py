@@ -1,3 +1,8 @@
+# --------------------------------------------------------------------------------
+# Commands:
+#   - 'q' to quit
+# --------------------------------------------------------------------------------
+
 import math
 import urllib
 import pathlib
@@ -14,6 +19,7 @@ from mediapipe.tasks.python.core import base_options as base_options_module
 DESIRED_HEIGHT = 480
 DESIRED_WIDTH = 480
 
+
 # Function to resize the frame to a fixed size
 def resize_frame(image):
     h, w = image.shape[:2]
@@ -27,6 +33,8 @@ def resize_frame(image):
         )
     return resized_image
 
+
+# --------------------------------------------------------------------------------
 
 # Path to the model file
 model_path = pathlib.Path("models/classifier.tflite")
@@ -44,6 +52,8 @@ if not model_path.exists():
 base_options = base_options_module.BaseOptions(model_asset_path=str(model_path))
 options = vision.ImageClassifierOptions(base_options=base_options, max_results=4)
 classifier = vision.ImageClassifier.create_from_options(options)
+
+# --------------------------------------------------------------------------------
 
 # Open webcam video stream
 cap = cv2.VideoCapture(1)
