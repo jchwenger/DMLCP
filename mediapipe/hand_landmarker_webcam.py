@@ -18,6 +18,9 @@ BLACK_COLOR = (0, 0, 0)
 RED_COLOR = (0, 0, 255)
 GREEN_COLOR = (0, 128, 0)
 BLUE_COLOR = (255, 0, 0)
+MAGENTA_COLOR = (255, 0, 255)
+CYAN_COLOR = (255, 255, 0)
+YELLOW_COLOR = (0, 255, 255)
 _BGR_CHANNELS = 3
 _VISIBILITY_THRESHOLD = 0.5
 _PRESENCE_THRESHOLD = 0.5
@@ -28,14 +31,23 @@ FONT_SIZE = 2
 FONT_THICKNESS = 2
 HANDEDNESS_TEXT_COLOR = (88, 205, 54)  # vibrant green
 
-# Hand connections (mirrors mediapipe.solutions.hands.HAND_CONNECTIONS)
-HAND_CONNECTIONS = frozenset([
-    (0, 1), (1, 2), (2, 3), (3, 4),
-    (0, 5), (5, 6), (6, 7), (7, 8),
-    (5, 9), (9, 10), (10, 11), (11, 12),
-    (9, 13), (13, 14), (14, 15), (15, 16),
-    (13, 17), (17, 18), (18, 19), (19, 20),
-    (0, 17),
+# https://github.com/google-ai-edge/mediapipe/blob/9e4f898b22cf445c0ba7edc81ab4eb669fd71e89/mediapipe/python/solutions/hands_connections.py#L16
+HAND_PALM_CONNECTIONS = ((0, 1), (0, 5), (9, 13), (13, 17), (5, 9), (0, 17))
+
+HAND_THUMB_CONNECTIONS = ((1, 2), (2, 3), (3, 4))
+
+HAND_INDEX_FINGER_CONNECTIONS = ((5, 6), (6, 7), (7, 8))
+
+HAND_MIDDLE_FINGER_CONNECTIONS = ((9, 10), (10, 11), (11, 12))
+
+HAND_RING_FINGER_CONNECTIONS = ((13, 14), (14, 15), (15, 16))
+
+HAND_PINKY_FINGER_CONNECTIONS = ((17, 18), (18, 19), (19, 20))
+
+HAND_CONNECTIONS = frozenset().union(*[
+    HAND_PALM_CONNECTIONS, HAND_THUMB_CONNECTIONS,
+    HAND_INDEX_FINGER_CONNECTIONS, HAND_MIDDLE_FINGER_CONNECTIONS,
+    HAND_RING_FINGER_CONNECTIONS, HAND_PINKY_FINGER_CONNECTIONS
 ])
 
 
@@ -156,7 +168,7 @@ detector = vision.HandLandmarker.create_from_options(options)
 
 
 # Function to draw landmarks on the image
-def draw_landmarks_on_image(rgb_image, detection_result):
+def draw_landmarks_on_image(rgb_image, detection_result, draw_subsets=False):
     hand_landmarks_list = detection_result.hand_landmarks
     handedness_list = detection_result.handedness
     annotated_image = np.copy(rgb_image)
@@ -169,13 +181,70 @@ def draw_landmarks_on_image(rgb_image, detection_result):
             "Right" if handedness[0].category_name == "Left" else "Left"
         )
 
-        draw_landmarks(
-            image=annotated_image,
-            landmark_list=hand_landmarks,
-            connections=HAND_CONNECTIONS,
-            landmark_drawing_spec=DrawingSpec(color=GREEN_COLOR, thickness=2, circle_radius=2),
-            connection_drawing_spec=DrawingSpec(color=BLUE_COLOR, thickness=2, circle_radius=0),
-        )
+        if draw_subsets:
+            draw_landmarks(
+                image=annotated_image,
+                landmark_list=hand_landmarks,
+                connections=HAND_PALM_CONNECTIONS,
+                landmark_drawing_spec=None,
+                connection_drawing_spec=DrawingSpec(color=MAGENTA_COLOR, thickness=2, circle_radius=0),
+                is_drawing_landmarks=False,
+            )
+            draw_landmarks(
+                image=annotated_image,
+                landmark_list=hand_landmarks,
+                connections=HAND_THUMB_CONNECTIONS,
+                landmark_drawing_spec=None,
+                connection_drawing_spec=DrawingSpec(color=CYAN_COLOR, thickness=2, circle_radius=0),
+                is_drawing_landmarks=False,
+            )
+            draw_landmarks(
+                image=annotated_image,
+                landmark_list=hand_landmarks,
+                connections=HAND_INDEX_FINGER_CONNECTIONS,
+                landmark_drawing_spec=None,
+                connection_drawing_spec=DrawingSpec(color=YELLOW_COLOR, thickness=2, circle_radius=0),
+                is_drawing_landmarks=False,
+            )
+            draw_landmarks(
+                image=annotated_image,
+                landmark_list=hand_landmarks,
+                connections=HAND_MIDDLE_FINGER_CONNECTIONS,
+                landmark_drawing_spec=None,
+                connection_drawing_spec=DrawingSpec(color=BLUE_COLOR, thickness=2, circle_radius=0),
+                is_drawing_landmarks=False,
+            )
+            draw_landmarks(
+                image=annotated_image,
+                landmark_list=hand_landmarks,
+                connections=HAND_RING_FINGER_CONNECTIONS,
+                landmark_drawing_spec=None,
+                connection_drawing_spec=DrawingSpec(color=GREEN_COLOR, thickness=2, circle_radius=0),
+                is_drawing_landmarks=False,
+            )
+            draw_landmarks(
+                image=annotated_image,
+                landmark_list=hand_landmarks,
+                connections=HAND_PINKY_FINGER_CONNECTIONS,
+                landmark_drawing_spec=None,
+                connection_drawing_spec=DrawingSpec(color=RED_COLOR, thickness=2, circle_radius=0),
+                is_drawing_landmarks=False,
+            )
+            # Draw landmarks once after connections for clarity.
+            draw_landmarks(
+                image=annotated_image,
+                landmark_list=hand_landmarks,
+                connections=None,
+                landmark_drawing_spec=DrawingSpec(color=WHITE_COLOR, thickness=2, circle_radius=2),
+            )
+        else:
+            draw_landmarks(
+                image=annotated_image,
+                landmark_list=hand_landmarks,
+                connections=HAND_CONNECTIONS,
+                landmark_drawing_spec=DrawingSpec(color=GREEN_COLOR, thickness=2, circle_radius=2),
+                connection_drawing_spec=DrawingSpec(color=BLUE_COLOR, thickness=2, circle_radius=0),
+            )
 
         # Get the top left corner of the detected hand's bounding box
         height, width, _ = annotated_image.shape
@@ -201,6 +270,7 @@ def draw_landmarks_on_image(rgb_image, detection_result):
 
 # Open webcam video stream
 cap = cv2.VideoCapture(1)
+draw_subsets = False
 
 while cap.isOpened():
     ret, frame = cap.read()
@@ -220,7 +290,7 @@ while cap.isOpened():
 
     # Annotate frame with detected landmarks
     if detection_result:
-        annotated_frame = draw_landmarks_on_image(frame, detection_result)
+        annotated_frame = draw_landmarks_on_image(frame, detection_result, draw_subsets)
     else:
         annotated_frame = frame
 
@@ -228,8 +298,11 @@ while cap.isOpened():
     cv2.imshow("Hand Detection", annotated_frame)
 
     # Exit on pressing 'q'
-    if cv2.waitKey(5) & 0xFF == ord("q"):
+    key = cv2.waitKey(5) & 0xFF
+    if key == ord("q"):
         break
+    if key == ord("1"):
+        draw_subsets = not draw_subsets
 
 cap.release()
 cv2.destroyAllWindows()
