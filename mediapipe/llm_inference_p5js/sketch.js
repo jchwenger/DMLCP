@@ -1,5 +1,5 @@
-// Import p5.js as an ES module
-import p5 from 'https://cdn.skypack.dev/p5';
+// Import p5.js as an ES module (jsDelivr ESM endpoint avoids skypack build errors)
+import p5 from 'https://cdn.jsdelivr.net/npm/p5@1.9.1/+esm';
 
 // Import FilesetResolver and LlmInference from MediaPipe Tasks GenAI
 import { FilesetResolver, LlmInference } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai';
@@ -95,7 +95,7 @@ new p5((sketch) => {
       })
       .catch((e) => {
         console.error(e);
-        alert('Failed to load the model.');
+        alert('Failed to load the model. Are you in Chrome?');
       });
   };
 
