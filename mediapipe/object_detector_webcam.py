@@ -1,3 +1,8 @@
+# --------------------------------------------------------------------------------
+# Commands:
+#   - 'q' to quit
+# --------------------------------------------------------------------------------
+
 import time
 import pathlib
 import argparse
@@ -23,6 +28,7 @@ FPS_AVG_FRAME_COUNT = 10
 DEFAULT_MODEL_PATH = pathlib.Path("models/efficientdet.tflite")
 DEFAULT_MODEL_URL = "https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/int8/1/efficientdet.tflite"
 
+
 def visualize(image, detection_result) -> np.ndarray:
     """Draws bounding boxes on the input image and return it.
     Args:
@@ -32,7 +38,6 @@ def visualize(image, detection_result) -> np.ndarray:
         Image with bounding boxes.
     """
     for detection in detection_result.detections:
-
         # Draw bounding box
         bbox = detection.bounding_box
         start_point = bbox.origin_x, bbox.origin_y
@@ -73,11 +78,11 @@ def ensure_model(model_path: pathlib.Path, url: str) -> pathlib.Path:
 def show_fps(
     current_frame,
     fps,
-    row_size = 40,  # pixels
-    left_margin = 24,  # pixels
-    text_color = (20, 60, 220),  # crimson (BGR)
-    font_size = 2,
-    font_thickness = 2,
+    row_size=40,  # pixels
+    left_margin=24,  # pixels
+    text_color=(20, 60, 220),  # crimson (BGR)
+    font_size=2,
+    font_thickness=2,
 ):
     # Show the FPS
     fps_text = "FPS = {:.1f}".format(fps)
@@ -91,6 +96,10 @@ def show_fps(
         text_color,
         font_thickness,
     )
+
+
+# --------------------------------------------------------------------------------
+
 
 def run(args):
     """Continuously run inference on images acquired from the camera.
@@ -131,7 +140,6 @@ def run(args):
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, args.frame_height)
 
     while cap.isOpened():
-
         success, frame = cap.read()
         if not success:
             print("Failed to grab frame")
@@ -180,8 +188,10 @@ def run(args):
     cap.release()
     cv2.destroyAllWindows()
 
-if __name__ == "__main__":
 
+# --------------------------------------------------------------------------------
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
@@ -236,4 +246,3 @@ if __name__ == "__main__":
     args.model = pathlib.Path(args.model)
 
     run(args)
-
