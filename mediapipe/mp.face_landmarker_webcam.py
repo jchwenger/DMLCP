@@ -1,4 +1,5 @@
 # --------------------------------------------------------------------------------
+
 # Commands:
 #   - 'q' to quit
 # --------------------------------------------------------------------------------
@@ -14,6 +15,7 @@ import mediapipe as mp
 from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.core import base_options as base_options_module
 
+from utils import ensure_model
 
 from utils import DrawingSpec
 from utils import draw_landmarks
@@ -44,6 +46,7 @@ from utils import FACEMESH_RIGHT_EYEBROW
 WINDOW_NAME = "Face Detection"
 DESIRED_HEIGHT = 800
 DESIRED_WIDTH = 600
+
 
 # Function to draw landmarks on the image
 def draw_landmarks_on_image(rgb_image, detection_result):
@@ -146,15 +149,8 @@ def draw_landmarks_on_image(rgb_image, detection_result):
 
 # Path to the model file
 model_path = pathlib.Path("models/face_landmarker.task")
-model_path.parent.mkdir(exist_ok=True)
-
-# Check if the model file exists, if not, download it
-if not model_path.exists():
-    url = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task"
-    print()
-    print(f"Downloading model from {url}...")
-    urllib.request.urlretrieve(url, model_path)
-    print(f"Model downloaded and saved as {model_path}")
+url = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task"
+model_path = ensure_model(model_path, url)
 
 # Initialize MediaPipe FaceLandmarker
 base_options = base_options_module.BaseOptions(model_asset_path=str(model_path))

@@ -1,4 +1,5 @@
 # --------------------------------------------------------------------------------
+
 # Commands:
 #   - 'q' to quit
 #   - '1' to toggle hand colours
@@ -18,6 +19,8 @@ import cv2
 import mediapipe as mp
 from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.core import base_options as base_options_module
+
+from utils import ensure_model
 
 from utils import DrawingSpec
 from utils import draw_landmarks
@@ -213,14 +216,8 @@ def draw_landmarks_and_gestures_on_image(
 
 # Path to the model file
 model_path = pathlib.Path("models/gesture_recognizer.task")
-model_path.parent.mkdir(exist_ok=True)
-
-# Check if the model file exists, if not, download it
-if not model_path.exists():
-    url = "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/latest/gesture_recognizer.task"
-    print(f"Downloading model from {url}...")
-    urllib.request.urlretrieve(url, model_path)
-    print(f"Model downloaded and saved as {model_path}")
+url = "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/latest/gesture_recognizer.task"
+model_path = ensure_model(model_path, url)
 
 # Initialize MediaPipe GestureRecognizer
 base_options = base_options_module.BaseOptions(model_asset_path=str(model_path))

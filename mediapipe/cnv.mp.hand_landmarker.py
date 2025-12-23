@@ -7,6 +7,8 @@ import mediapipe as mp
 from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.core import base_options as base_options_module
 
+from utils import ensure_model
+
 from utils import HAND_PALM_CONNECTIONS
 from utils import HAND_THUMB_CONNECTIONS
 from utils import HAND_INDEX_FINGER_CONNECTIONS

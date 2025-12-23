@@ -18,6 +18,7 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.components import containers
 
+from utils import ensure_model
 from utils import _normalized_to_pixel_coordinates
 
 # --------------------------------------------------------------------------------
@@ -54,14 +55,8 @@ def click_event(event, x, y, flags, param):
 
 # Path to the model file
 model_path = pathlib.Path("models/interactive_segmenter.tflite")
-
-# Check if the model file exists, if not, download it
-if not model_path.exists():
-    url = "https://storage.googleapis.com/mediapipe-models/interactive_segmenter/magic_touch/float32/1/magic_touch.tflite"
-    print()
-    print(f"Downloading model from {url}...")
-    urllib.request.urlretrieve(url, model_path)
-    print(f"Model downloaded and saved as {model_path}")
+url = "https://storage.googleapis.com/mediapipe-models/interactive_segmenter/magic_touch/float32/1/magic_touch.tflite"
+model_path = ensure_model(model_path, url)
 
 # Initialize ImageSegmenter
 base_options = python.BaseOptions(model_asset_path=str(model_path))

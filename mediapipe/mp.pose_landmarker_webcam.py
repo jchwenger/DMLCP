@@ -1,4 +1,5 @@
 # --------------------------------------------------------------------------------
+
 # Commands:
 #   - '1' to toggle pose segmentation mask
 #     (0: no mask, 1: mask only, 2: mask with transparency)
@@ -18,6 +19,8 @@ import cv2
 import mediapipe as mp
 from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.core import base_options as base_options_module
+
+from utils import ensure_model
 
 from utils import DrawingSpec
 from utils import draw_landmarks
@@ -43,6 +46,7 @@ BLUE_COLOR = (255, 0, 0)
 _BGR_CHANNELS = 3
 _VISIBILITY_THRESHOLD = 0.5
 _PRESENCE_THRESHOLD = 0.5
+
 
 # Function to draw landmarks on the image
 def draw_landmarks_on_image(bgr_image, detection_result):
@@ -71,14 +75,8 @@ def draw_landmarks_on_image(bgr_image, detection_result):
 
 # Path to the model file
 model_path = pathlib.Path("models/pose_landmarker.task")
-model_path.parent.mkdir(exist_ok=True)
-
-# Check if the model file exists, if not, download it
-if not model_path.exists():
-    url = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_heavy/float16/latest/pose_landmarker_heavy.task"
-    print(f"Downloading model from {url}...")
-    urllib.request.urlretrieve(url, model_path)
-    print(f"Model downloaded and saved as {model_path}")
+url = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_heavy/float16/latest/pose_landmarker_heavy.task"
+model_path = ensure_model(model_path, url)
 
 # Initialize PoseLandmarker
 base_options = base_options_module.BaseOptions(model_asset_path=str(model_path))

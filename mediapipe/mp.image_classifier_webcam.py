@@ -15,6 +15,7 @@ import mediapipe as mp
 from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.core import base_options as base_options_module
 
+from utils import ensure_model
 
 WINDOW_NAME = "Image Classification"
 
@@ -26,15 +27,8 @@ DESIRED_WIDTH = 600
 
 # Path to the model file
 model_path = pathlib.Path("models/classifier.tflite")
-model_path.parent.mkdir(exist_ok=True)
-
-# Check if the model file exists, if not, download it
-if not model_path.exists():
-    url = "https://storage.googleapis.com/mediapipe-models/image_classifier/efficientnet_lite0/float32/1/efficientnet_lite0.tflite"
-    print()
-    print(f"Downloading model from {url}...")
-    urllib.request.urlretrieve(url, model_path)
-    print(f"Model downloaded and saved as {model_path}")
+url = "https://storage.googleapis.com/mediapipe-models/image_classifier/efficientnet_lite0/float32/1/efficientnet_lite0.tflite"
+model_path = ensure_model(model_path, url)
 
 # Initialize MediaPipe ImageClassifier
 base_options = base_options_module.BaseOptions(model_asset_path=str(model_path))
@@ -82,7 +76,7 @@ while cap.isOpened():
             prediction_text,
             org=(30, 30),  # bottom left corner of text
             fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-            fontScale=.5,
+            fontScale=0.5,
             color=(0, 255, 0),
             thickness=1,
             lineType=cv2.LINE_AA,  # antialiased line
