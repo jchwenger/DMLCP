@@ -33,17 +33,8 @@ from utils import FACEMESH_RIGHT_EYEBROW
 
 # Path to the model file
 model_path = pathlib.Path("models/face_landmarker.task")
-model_path.parent.mkdir(exist_ok=True)
-
-# Check if the model file exists, if not, download it
-if not model_path.exists():
-    url = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker.task"
-    print()
-    print(f"Downloading model from {url}...")
-    with urllib.request.urlopen(url) as r, model_path.open("wb") as o:
-        while chunk := r.read(1024):
-            o.write(chunk)
-    print(f"Model downloaded and saved as {model_path}")
+url = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker.task"
+model_path = ensure_model(model_path, url)
 
 # Initialize MediaPipe FaceLandmarker
 base_options = base_options_module.BaseOptions(model_asset_path=str(model_path))
