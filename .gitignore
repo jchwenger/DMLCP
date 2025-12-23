@@ -19,3 +19,6 @@ venv
 
 # vim
 *.sw*
+
+# canvas
+**/imgui.ini
