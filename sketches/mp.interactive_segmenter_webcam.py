@@ -25,11 +25,11 @@ from utils import _normalized_to_pixel_coordinates
 
 # Variables to control transparency
 # 0: no mask, 1: mask only, 2: mask with transparency
-foreground_display_mode = 0
-background_display_mode = 0
+FOREGROUND_DISPLAY_MODE = 0
+BACKGROUND_DISPLAY_MODE = 0
 
 # Default initial selection point
-keypoint_x, keypoint_y = 0.5, 0.5
+KEYPOINT_X, KEYPOINT_Y = 0.5, 0.5
 
 # Constants for segmentation
 BG_COLOR = (255, 0, 255)  # magenta
@@ -46,9 +46,9 @@ DESIRED_WIDTH = 600
 
 # Callback function to select point on mouse click
 def click_event(event, x, y, flags, param):
-    global keypoint_x, keypoint_y
+    global KEYPOINT_X, KEYPOINT_Y
     if event == cv2.EVENT_LBUTTONDOWN:
-        keypoint_x, keypoint_y = x / param[0], y / param[1]
+        KEYPOINT_X, KEYPOINT_Y = x / param[0], y / param[1]
 
 
 # --------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ while cap.isOpened():
     # Perform segmentation on the selected keypoint
     roi = RegionOfInterest(
         format=RegionOfInterest.Format.KEYPOINT,
-        keypoint=NormalizedKeypoint(keypoint_x, keypoint_y),
+        keypoint=NormalizedKeypoint(KEYPOINT_X, KEYPOINT_Y),
     )
     segmentation_result = segmenter.segment(mp_image, roi)
     category_mask = segmentation_result.category_mask
@@ -110,23 +110,23 @@ while cap.isOpened():
     bg_overlay[:] = BG_COLOR
 
     # Apply the foreground mask based on the selected display mode
-    if foreground_display_mode == 1:  # Only mask (fully opaque)
+    if FOREGROUND_DISPLAY_MODE == 1:  # Only mask (fully opaque)
         output_image = np.where(condition, fg_overlay, rgb_frame)
-    elif foreground_display_mode == 2:  # Mask with transparency
+    elif FOREGROUND_DISPLAY_MODE == 2:  # Mask with transparency
         output_image = cv2.addWeighted(fg_overlay, 0.5, rgb_frame, 0.5, 0)
         output_image = np.where(condition, output_image, rgb_frame)
     else:  # No mask, original frame
         output_image = rgb_frame
 
     # Apply the background mask based on the selected display mode
-    if background_display_mode == 1:  # Only mask (fully opaque)
+    if BACKGROUND_DISPLAY_MODE == 1:  # Only mask (fully opaque)
         output_image = np.where(~condition, bg_overlay, output_image)
-    elif background_display_mode == 2:  # Mask with transparency
+    elif BACKGROUND_DISPLAY_MODE == 2:  # Mask with transparency
         temp_bg_image = cv2.addWeighted(bg_overlay, 0.5, rgb_frame, 0.5, 0)
         output_image = np.where(~condition, temp_bg_image, output_image)
 
     # Draw a white dot with black border to denote the point of interest
-    keypoint_px = _normalized_to_pixel_coordinates(keypoint_x, keypoint_y, w, h)
+    keypoint_px = _normalized_to_pixel_coordinates(KEYPOINT_X, KEYPOINT_Y, w, h)
     cv2.circle(output_image, keypoint_px, 6 + 5, (0, 0, 0), -1)
     cv2.circle(output_image, keypoint_px, 6, (255, 255, 255), -1)
 
@@ -144,12 +144,12 @@ while cap.isOpened():
     if key == ord("q"):  # Exit on 'q'
         break
     elif key == ord("1"):  # Toggle foreground mask
-        foreground_display_mode = (
-            foreground_display_mode + 1
+        FOREGROUND_DISPLAY_MODE = (
+            FOREGROUND_DISPLAY_MODE + 1
         ) % 3  # Cycles through 0, 1, 2
     elif key == ord("2"):  # Toggle background mask
-        background_display_mode = (
-            background_display_mode + 1
+        BACKGROUND_DISPLAY_MODE = (
+            BACKGROUND_DISPLAY_MODE + 1
         ) % 3  # Cycles through 0, 1, 2
 
 cap.release()

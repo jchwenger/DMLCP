@@ -31,21 +31,14 @@ from utils import POSE_CONNECTIONS
 
 # Segmentation mask display modes
 # 0: No mask, 1: Transparent overlay, 2: Only mask
-segmentation_mode = 0
+SEGMENTATION_MODE = 0
 
-# Display configuration
 WINDOW_NAME = "Pose Detection"
 DESIRED_HEIGHT = 800
 DESIRED_WIDTH = 600
 
-# Drawing constants
-WHITE_COLOR = (224, 224, 224)
-RED_COLOR = (0, 0, 255)
 GREEN_COLOR = (0, 128, 0)
 BLUE_COLOR = (255, 0, 0)
-_BGR_CHANNELS = 3
-_VISIBILITY_THRESHOLD = 0.5
-_PRESENCE_THRESHOLD = 0.5
 
 
 # Function to draw landmarks on the image
@@ -123,14 +116,14 @@ while cap.isOpened():
         # Expand to 3 channels for blending or display.
         mask_rgb = np.repeat(mask_8u[:, :], 3, axis=2)
 
-        if segmentation_mode == 1:  # Transparent overlay
+        if SEGMENTATION_MODE == 1:  # Transparent overlay
             # Blend the segmentation mask with the frame (semi-transparent overlay)
             alpha = 0.5  # Transparency factor
             annotated_frame = cv2.addWeighted(
                 annotated_frame, 1 - alpha, mask_rgb, alpha, 0
             )
 
-        elif segmentation_mode == 2:  # Only the segmentation mask
+        elif SEGMENTATION_MODE == 2:  # Only the segmentation mask
             annotated_frame = mask_rgb
 
     # Display the annotated frame
@@ -141,7 +134,7 @@ while cap.isOpened():
     if key == ord("q"):  # Exit on 'q'
         break
     elif key == ord("1"):  # Toggle segmentation mask display mode
-        segmentation_mode = (segmentation_mode + 1) % 3  # Cycles through 0, 1, 2
+        SEGMENTATION_MODE = (SEGMENTATION_MODE + 1) % 3  # Cycles through 0, 1, 2
 
 cap.release()
 cv2.destroyAllWindows()

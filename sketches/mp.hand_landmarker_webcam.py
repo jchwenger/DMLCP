@@ -35,15 +35,12 @@ from utils import HAND_CONNECTIONS
 
 # --------------------------------------------------------------------------------
 
-draw_subsets = False
-
-# Display configuration
 WINDOW_NAME = "Hand Detection"
 DESIRED_HEIGHT = 800
 DESIRED_WIDTH = 600
+DRAW_SUBSETS = False
 
-# Text overlay constants
-MARGIN = 10  # pixels
+MARGIN = 10
 FONT_SIZE = 2
 FONT_THICKNESS = 2
 
@@ -58,7 +55,7 @@ YELLOW_COLOR = (0, 255, 255)
 
 
 # Function to draw landmarks on the image
-def draw_landmarks_on_image(rgb_image, detection_result, draw_subsets=False):
+def draw_landmarks_on_image(rgb_image, detection_result, DRAW_SUBSETS=False):
     hand_landmarks_list = detection_result.hand_landmarks
     handedness_list = detection_result.handedness
     annotated_image = np.copy(rgb_image)
@@ -71,7 +68,7 @@ def draw_landmarks_on_image(rgb_image, detection_result, draw_subsets=False):
             "Right" if handedness[0].category_name == "Left" else "Left"
         )
 
-        if draw_subsets:
+        if DRAW_SUBSETS:
             draw_landmarks(
                 image=annotated_image,
                 landmark_list=hand_landmarks,
@@ -220,7 +217,7 @@ while cap.isOpened():
     # Annotate frame with detected landmarks
     if detection_result:
         annotated_frame = draw_landmarks_on_image(
-            resized_frame, detection_result, draw_subsets
+            resized_frame, detection_result, DRAW_SUBSETS
         )
     else:
         annotated_frame = resized_frame
@@ -233,7 +230,7 @@ while cap.isOpened():
     if key == ord("q"):
         break
     if key == ord("1"):
-        draw_subsets = not draw_subsets
+        DRAW_SUBSETS = not DRAW_SUBSETS
 
 cap.release()
 cv2.destroyAllWindows()

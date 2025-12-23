@@ -27,14 +27,11 @@ from utils import draw_landmarks
 
 # --------------------------------------------------------------------------------
 
-draw_subsets = False
-
-# Display configuration
 WINDOW_NAME = "Gesture Recognition"
 DESIRED_HEIGHT = 800
 DESIRED_WIDTH = 600
+DRAW_SUBSETS = False
 
-# Constants
 MARGIN = 10  # pixels
 FONT_SIZE = 2
 FONT_THICKNESS = 2
@@ -75,7 +72,7 @@ HAND_CONNECTIONS = frozenset().union(
 
 # Function to draw landmarks and recognized gestures on the image
 def draw_landmarks_and_gestures_on_image(
-    bgr_image, recognition_result, draw_subsets=False
+    bgr_image, recognition_result, DRAW_SUBSETS=False
 ):
     annotated_image = np.copy(bgr_image)
 
@@ -94,7 +91,7 @@ def draw_landmarks_and_gestures_on_image(
         )
         gesture = gesture_list[idx] if idx < len(gesture_list) else []
 
-        if draw_subsets:
+        if DRAW_SUBSETS:
             draw_landmarks(
                 image=annotated_image,
                 landmark_list=hand_landmarks,
@@ -273,7 +270,7 @@ while cap.isOpened():
     # Annotate frame with detected landmarks and gestures
     if recognition_result:
         annotated_frame = draw_landmarks_and_gestures_on_image(
-            resized_frame, recognition_result, draw_subsets
+            resized_frame, recognition_result, DRAW_SUBSETS
         )
     else:
         annotated_frame = resized_frame
@@ -286,7 +283,7 @@ while cap.isOpened():
     if key == ord("q"):
         break
     if key == ord("1"):
-        draw_subsets = not draw_subsets
+        DRAW_SUBSETS = not DRAW_SUBSETS
 
 cap.release()
 cv2.destroyAllWindows()

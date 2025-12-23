@@ -17,13 +17,11 @@ from mediapipe.tasks.python.core import base_options as base_options_module
 
 from utils import ensure_model
 
-WINDOW_NAME = "Image Classification"
+# --------------------------------------------------------------------------------
 
-# Height and width that will be used by the model
+WINDOW_NAME = "Image Classification"
 DESIRED_HEIGHT = 800
 DESIRED_WIDTH = 600
-
-# --------------------------------------------------------------------------------
 
 # Path to the model file
 model_path = pathlib.Path("models/classifier.tflite")
