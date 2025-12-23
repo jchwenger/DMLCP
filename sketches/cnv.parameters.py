@@ -1,63 +1,86 @@
 from py5canvas import *
 
-import numpy as np
+ALIGN_OPTIONS = [CENTER, LEFT, RIGHT]
+VALIGN_OPTIONS = [CENTER, TOP, BOTTOM]
 
 
 def parameters():
-    # This will expose a 'params' variable
+    # Note: all these will be turned to lowercase when working on the object, so
+    # we only use caps here so that the GUI looks nicer
     return {
-        "Width": (100.0, {"min": 10, "max": 200}),
-        "Height": (100.0, {"min": 10, "max": 200}),
-        "Color": ([255, 0, 0], {"type": "color"}),
-        "Hue": (0.0, {"min": 0, "max": 1}),
         "Show": True,
-        "Other": {  # Unused parameters for demo purposes
-            "A text": ("Hello World", {"multiline": True, "buf_length": 2024}),
-            "Selection": (
-                0,
-                {"selection": ["First option", "Second option", "Third option"]},
-            ),
-            "Font Size": 30,
-            "A real number": 0.0,
-            "Int slider": (0, {"min": 0, "max": 10}),
+        "Le text": ("[]", {"multiline": True, "buf_length": 2024}),
+        "Size": (400, {"min": 50, "max": 500}),
+        "X": (0.0, {"min": -100, "max": 100}),
+        "Y": (0.0, {"min": -100, "max": 100}),
+        "Color": ([255, 0, 0], {"type": "color"}),
+        # this will create a select menu, yielding the **index** (0, 1,...)!
+        "Align": (
+            0,
+            {
+                "selection": ALIGN_OPTIONS,
+            },
+        ),
+        "Vertical Align": (
+            0,
+            {
+                "selection": VALIGN_OPTIONS,
+            },
+        ),
+        # it is possible to nest things
+        "Other": {
+            "Helper": False,
+            "Helper radius": 5.0,
+            "Background": (100, {"min": 0, "max": 255}),
         },
     }
 
 
 def setup():
-    create_canvas(512, 512)
+    # setting this to `False` will stretch the canvas when going fullscreen
+    sketch.keep_aspect_ratio = False
+    create_canvas(256, 512, 300)
 
 
 def draw():
-    background(0)
-
-    # Once processed and by default, parameters are accessed with the labels
+    # once processed and by default, parameters are accessed with the labels
     # converted to lowercase and spaces replaced by underscores.
-    # Center of screen
+
+    background(params.other.background)
+
+    # translate to the centre
     translate(width / 2, height / 2)
+
+    text_size(params.size)
+    fill(params.color)
+    text_align(ALIGN_OPTIONS[params.align], VALIGN_OPTIONS[params.vertical_align])
+
     if params.show:
-        fill(255)
-        text_size(params.other.font_size)
-        text(params.other.a_text, [0, 0], center="True")
-        fill(params.color)
-        rectangle(
-            -params.width / 2 + np.sin(frame_count / 20) * 200,
-            -params.height / 2,
-            params.width,
-            params.height,
+        # draw a dot
+        if params.other.helper:
+            push()
+            fill(255)
+            no_stroke()
+            circle(params.x, params.y, params.other.helper_radius)
+            no_fill()
+            stroke(0, 255, 0)
+            b = text_bounds(params.le_text)
+            # print(b)
+            rect(b.pos, b.size)
+            pop()
+
+        text(
+            params.le_text,
+            params.x + (sin(frame_count / 20) * 20),
+            params.y,
         )
-    # Check if text changed. We use the dot notation,
-    # as a string to check for a subparameter.
-    if "other.a_text" in sketch.gui.changed:
-        print("Text changed")
-    if "hue" in sketch.gui.changed:
-        sketch.set_gui_theme(params.hue)
-        print("Hue changed")
 
 
 def key_pressed(key, modifier):
     if key == " ":
-        toggle_gui()
+        # SPACE toggles fullscreen
+        # (hiding the gui when fullscreen
+        toggle_fullscreen(toggle_gui=True)
 
 
 run()
