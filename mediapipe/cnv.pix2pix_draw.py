@@ -27,7 +27,7 @@ result = np.zeros((256, 256, 3))
 # model available here:
 # https://drive.usercontent.google.com/u/0/uc?id=1OmSp5ymSFHu_M4ZJPmt-u-DROCalFRzK&export=download
 PIX2PIX_PATH = pathlib.Path(
-    "../../python/models/pix2pix_rembrandt/pix2pix_rembrandt.iter_10879_scripted.pt"
+    "../python/models/pix2pix_rembrandt/pix2pix_rembrandt.iter_10879_scripted.pt"
 )
 
 # Load pix2pix model
@@ -98,7 +98,7 @@ def key_pressed(key, modifier):
 def mouse_released():
     global result
     print("generating")
-    img = get_image()[:, : sketch.width // 2, :]
+    img = np.array(get_image())[:, : sketch.width // 2, :]
     result = generate(G, img)
 
 

@@ -28,7 +28,7 @@ vid = VideoInput(size=(w, h))
 # model available here:
 # https://drive.google.com/file/d/1H95702mO-7dkYjaJa_Bz4AqUvPL2B7vS/view?usp=sharing
 PIX2PIX_PATH = pathlib.Path(
-    "../../python/models/pix2pix_facades/pix2pix_facades.iter_8000_scripted.pt"
+    "../python/models/pix2pix_facades/pix2pix_facades.iter_8000_scripted.pt"
 )
 
 # Load pix2pix model
@@ -92,7 +92,7 @@ def random_label():
 #    #fill(jet_color(random_label()))
 #    #circle(np.random.uniform(pad, height-pad, size=2), np.random.uniform(5, height*0.15)*0.5) #, size=2))
 ## Get the left half of the canvas image
-# img = get_image()[:, :256]
+# img = np.array(get_image())[:, :256]
 
 # # And transform it using our pix2pix model
 # result = generate(model, img.copy())
@@ -125,14 +125,14 @@ def draw():
 
     if full:
         # Get half of canvas
-        img = get_image()[:, :256, :]
+        img = np.array(get_image())[:, :256, :]
 
         # Generate and draw result
         result = generate(G, img)
         image(result, [0, 0], [512, 512])
     else:
         # Get half of canvas
-        img = get_image()[:, :256, :]
+        img = np.array(get_image())[:, :256, :]
 
         # Generate and draw result
         result = generate(G, img)

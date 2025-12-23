@@ -40,7 +40,7 @@ b = seed1 @ seed2
 n_frames = 100
 
 # Local path to your trained net
-# DCGAN_PATH  = pathlib.Path("../../python/models/dcgan_mnist/dcgan_mnist_g.iter_0936_scripted.pt")
+# DCGAN_PATH  = pathlib.Path("../python/models/dcgan_mnist/dcgan_mnist_g.iter_0936_scripted.pt")
 
 # models available here:
 # MNIST: https://drive.usercontent.google.com/u/0/uc?id=1ZuePaVjXaAkQJTdeu060ELip6Ri6VMl2&export=download
@@ -48,10 +48,10 @@ n_frames = 100
 # CelebA (requires three channels): https://drive.google.com/file/d/1WBfUkjOtgTX2c2UgFYZY4skjMzDaGi2y/view?usp=sharing
 
 DCGAN_PATH = pathlib.Path(
-    "../../python/models/dcgan_mnist/dcgan_mnist_g.iter_0936_scripted.pt"
-    # "../../python/models/dcgan_fashion_mnist/dcgan_fashion_mnist_g.iter_2339_scripted.pt"
-    # "../../python/models/dcgan_fashion_mnist_redux/dcgan_mnist_g.iter_2340_scripted.pt"
-    # "../../python/models/dcgan_celeba/dcgan_celeba_g.iter_6791_scripted.pt"
+    "../python/models/dcgan_mnist/dcgan_mnist_g.iter_0936_scripted.pt"
+    # "../python/models/dcgan_fashion_mnist/dcgan_fashion_mnist_g.iter_2339_scripted.pt"
+    # "../python/models/dcgan_fashion_mnist_redux/dcgan_mnist_g.iter_2340_scripted.pt"
+    # "../python/models/dcgan_celeba/dcgan_celeba_g.iter_6791_scripted.pt"
 )
 
 # Load generator model
