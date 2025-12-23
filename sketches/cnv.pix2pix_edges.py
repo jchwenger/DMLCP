@@ -101,7 +101,7 @@ def draw():
 
     # Read video and compute landmarks
     frame = vid.read()
-    edges = apply_canny(frame)
+    edges = apply_canny(np.array(frame))
     res = generate(G, edges)
     if full:
         image(res, [0, 0], [width, height])
