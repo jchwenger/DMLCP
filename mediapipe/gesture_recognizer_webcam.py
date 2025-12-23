@@ -21,8 +21,16 @@ from mediapipe.tasks.python.core import base_options as base_options_module
 
 from utils import DrawingSpec
 from utils import draw_landmarks
+from utils import resize_frame
 
 # --------------------------------------------------------------------------------
+
+draw_subsets = False
+
+# Display configuration
+WINDOW_NAME = "Gesture Recognition"
+DESIRED_HEIGHT = 1280
+DESIRED_WIDTH = 832
 
 # Constants
 MARGIN = 10  # pixels
@@ -243,7 +251,9 @@ print("----------------------------------------")
 
 # Open webcam video stream
 cap = cv2.VideoCapture(1)
-draw_subsets = False
+
+cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_GUI_NORMAL)
+cv2.setWindowProperty(WINDOW_NAME, cv2.WND_PROP_AUTOSIZE, cv2.WINDOW_AUTOSIZE)
 
 while cap.isOpened():
     ret, frame = cap.read()
@@ -254,8 +264,11 @@ while cap.isOpened():
     # Flip the frame horizontally
     frame = cv2.flip(frame, 1)
 
+    # Resize the frame to the desired dimensions
+    resized_frame = resize_frame(frame, DESIRED_WIDTH, DESIRED_HEIGHT)
+
     # Convert the frame to RGB and create MediaPipe Image
-    rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    rgb_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2RGB)
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
 
     # Perform gesture recognition in the frame
@@ -264,13 +277,13 @@ while cap.isOpened():
     # Annotate frame with detected landmarks and gestures
     if recognition_result:
         annotated_frame = draw_landmarks_and_gestures_on_image(
-            frame, recognition_result, draw_subsets
+            resized_frame, recognition_result, draw_subsets
         )
     else:
-        annotated_frame = frame
+        annotated_frame = resized_frame
 
     # Display the annotated frame
-    cv2.imshow("Gesture Recognition", annotated_frame)
+    cv2.imshow(WINDOW_NAME, annotated_frame)
 
     # Exit on pressing 'q'
     key = cv2.waitKey(5) & 0xFF

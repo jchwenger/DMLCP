@@ -16,6 +16,8 @@ import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
+from utils import resize_frame
+
 # --------------------------------------------------------------------------------
 
 # Constants for drawing
@@ -29,6 +31,8 @@ FPS_AVG_FRAME_COUNT = 10
 
 DEFAULT_MODEL_PATH = pathlib.Path("models/efficientdet.tflite")
 DEFAULT_MODEL_URL = "https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/int8/1/efficientdet.tflite"
+
+WINDOW_NAME = "Object Detection"
 
 
 def visualize(image, detection_result) -> np.ndarray:
@@ -138,8 +142,8 @@ def run(args):
 
     # Open webcam video stream
     cap = cv2.VideoCapture(args.camera_id)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, args.frame_width)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, args.frame_height)
+    cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_GUI_NORMAL)
+    cv2.setWindowProperty(WINDOW_NAME, cv2.WND_PROP_AUTOSIZE, cv2.WINDOW_AUTOSIZE)
 
     while cap.isOpened():
         success, frame = cap.read()
@@ -153,8 +157,11 @@ def run(args):
         # Flip frame horizontally (like a mirror)
         frame = cv2.flip(frame, 1)
 
+        # Resize the frame to the desired dimensions
+        resized_frame = resize_frame(frame, args.frame_width, args.frame_height)
+
         # Convert frame to RGB format (as expected by MediaPipe)
-        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        rgb_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2RGB)
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
 
         # Run object detection using the model.
@@ -178,10 +185,10 @@ def run(args):
         if detection_result_list:
             # print(detection_result_list)
             annotated_frame = visualize(current_frame, detection_result_list[0])
-            cv2.imshow("Object Detection", annotated_frame)
+            cv2.imshow(WINDOW_NAME, annotated_frame)
             detection_result_list.clear()
         else:
-            cv2.imshow("Object Detection", current_frame)
+            cv2.imshow(WINDOW_NAME, current_frame)
 
         # Exit on pressing 'q'
         if cv2.waitKey(5) & 0xFF == ord("q"):

@@ -21,7 +21,23 @@ from mediapipe.tasks.python.core import base_options as base_options_module
 from utils import DrawingSpec
 from utils import draw_landmarks
 
+from utils import HAND_PALM_CONNECTIONS
+from utils import HAND_THUMB_CONNECTIONS
+from utils import HAND_INDEX_FINGER_CONNECTIONS
+from utils import HAND_MIDDLE_FINGER_CONNECTIONS
+from utils import HAND_RING_FINGER_CONNECTIONS
+from utils import HAND_PINKY_FINGER_CONNECTIONS
+from utils import HAND_CONNECTIONS
+from utils import resize_frame
+
 # --------------------------------------------------------------------------------
+
+draw_subsets = False
+
+# Display configuration
+WINDOW_NAME = "Hand Detection"
+DESIRED_HEIGHT = 1280
+DESIRED_WIDTH = 832
 
 # Text overlay constants
 MARGIN = 10  # pixels
@@ -36,31 +52,6 @@ BLUE_COLOR = (255, 0, 0)
 MAGENTA_COLOR = (255, 0, 255)
 CYAN_COLOR = (255, 255, 0)
 YELLOW_COLOR = (0, 255, 255)
-
-# https://github.com/google-ai-edge/mediapipe/blob/9e4f898b22cf445c0ba7edc81ab4eb669fd71e89/mediapipe/python/solutions/hands_connections.py#L16
-HAND_PALM_CONNECTIONS = ((0, 1), (0, 5), (9, 13), (13, 17), (5, 9), (0, 17))
-
-HAND_THUMB_CONNECTIONS = ((1, 2), (2, 3), (3, 4))
-
-HAND_INDEX_FINGER_CONNECTIONS = ((5, 6), (6, 7), (7, 8))
-
-HAND_MIDDLE_FINGER_CONNECTIONS = ((9, 10), (10, 11), (11, 12))
-
-HAND_RING_FINGER_CONNECTIONS = ((13, 14), (14, 15), (15, 16))
-
-HAND_PINKY_FINGER_CONNECTIONS = ((17, 18), (18, 19), (19, 20))
-
-HAND_CONNECTIONS = frozenset().union(
-    *[
-        HAND_PALM_CONNECTIONS,
-        HAND_THUMB_CONNECTIONS,
-        HAND_INDEX_FINGER_CONNECTIONS,
-        HAND_MIDDLE_FINGER_CONNECTIONS,
-        HAND_RING_FINGER_CONNECTIONS,
-        HAND_PINKY_FINGER_CONNECTIONS,
-    ]
-)
-
 
 # Function to draw landmarks on the image
 def draw_landmarks_on_image(rgb_image, detection_result, draw_subsets=False):
@@ -203,7 +194,11 @@ detector = vision.HandLandmarker.create_from_options(options)
 
 # Open webcam video stream
 cap = cv2.VideoCapture(1)
-draw_subsets = False
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
+cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_GUI_NORMAL)
+cv2.setWindowProperty(WINDOW_NAME, cv2.WND_PROP_AUTOSIZE, cv2.WINDOW_AUTOSIZE)
 
 while cap.isOpened():
     ret, frame = cap.read()
@@ -214,8 +209,11 @@ while cap.isOpened():
     # Flip the frame horizontally
     frame = cv2.flip(frame, 1)
 
+    # Resize the frame to the desired dimensions
+    resized_frame = resize_frame(frame, DESIRED_WIDTH, DESIRED_HEIGHT)
+
     # Convert the frame to RGB and create MediaPipe Image
-    rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    rgb_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2RGB)
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
 
     # Detect hand landmarks in the frame
@@ -223,12 +221,12 @@ while cap.isOpened():
 
     # Annotate frame with detected landmarks
     if detection_result:
-        annotated_frame = draw_landmarks_on_image(frame, detection_result, draw_subsets)
+        annotated_frame = draw_landmarks_on_image(resized_frame, detection_result, draw_subsets)
     else:
-        annotated_frame = frame
+        annotated_frame = resized_frame
 
     # Display the annotated frame
-    cv2.imshow("Hand Detection", annotated_frame)
+    cv2.imshow(WINDOW_NAME, annotated_frame)
 
     # Exit on pressing 'q'
     key = cv2.waitKey(5) & 0xFF

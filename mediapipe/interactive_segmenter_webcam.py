@@ -19,6 +19,7 @@ from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.components import containers
 
 from utils import _normalized_to_pixel_coordinates
+from utils import resize_frame
 
 # --------------------------------------------------------------------------------
 
@@ -36,6 +37,11 @@ FG_COLOR = (0, 255, 255)  # cyan
 
 RegionOfInterest = vision.InteractiveSegmenterRegionOfInterest
 NormalizedKeypoint = containers.keypoint.NormalizedKeypoint
+
+# Display configuration
+WINDOW_NAME = "Interactive Segmentation"
+DESIRED_HEIGHT = 1280
+DESIRED_WIDTH = 832
 
 
 # Callback function to select point on mouse click
@@ -70,6 +76,9 @@ segmenter = vision.InteractiveSegmenter.create_from_options(options)
 # Open webcam video stream
 cap = cv2.VideoCapture(1)
 
+cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_GUI_NORMAL)
+cv2.setWindowProperty(WINDOW_NAME, cv2.WND_PROP_AUTOSIZE, cv2.WINDOW_AUTOSIZE)
+
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
@@ -78,10 +87,12 @@ while cap.isOpened():
 
     # Flip frame horizontally (like a mirror)
     frame = cv2.flip(frame, 1)
-    h, w = frame.shape[:2]
+
+    resized_frame = resize_frame(frame, DESIRED_WIDTH, DESIRED_HEIGHT)
+    h, w = resized_frame.shape[:2]
 
     # Convert frame to RGB
-    rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    rgb_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2RGB)
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
 
     # Perform segmentation on the selected keypoint
@@ -129,10 +140,10 @@ while cap.isOpened():
     output_image = cv2.cvtColor(output_image, cv2.COLOR_RGB2BGR)
 
     # Display the output segmentation in real-time
-    cv2.imshow("Interactive Segmentation", output_image)
+    cv2.imshow(WINDOW_NAME, output_image)
 
     # Set mouse callback to capture click events
-    cv2.setMouseCallback("Interactive Segmentation", click_event, param=(w, h))
+    cv2.setMouseCallback(WINDOW_NAME, click_event, param=(w, h))
 
     # Capture keypress to toggle foreground/background display modes
     key = cv2.waitKey(5) & 0xFF

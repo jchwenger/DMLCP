@@ -22,12 +22,19 @@ from mediapipe.tasks.python.core import base_options as base_options_module
 from utils import DrawingSpec
 from utils import draw_landmarks
 
+from utils import POSE_CONNECTIONS
+from utils import resize_frame
+
 # --------------------------------------------------------------------------------
 
 # Segmentation mask display modes
 # 0: No mask, 1: Transparent overlay, 2: Only mask
 segmentation_mode = 0
 
+# Display configuration
+WINDOW_NAME = "Pose Detection"
+DESIRED_HEIGHT = 1280
+DESIRED_WIDTH = 832
 
 # Drawing constants
 WHITE_COLOR = (224, 224, 224)
@@ -37,18 +44,6 @@ BLUE_COLOR = (255, 0, 0)
 _BGR_CHANNELS = 3
 _VISIBILITY_THRESHOLD = 0.5
 _PRESENCE_THRESHOLD = 0.5
-
-# https://github.com/google-ai-edge/mediapipe/blob/9e4f898b22cf445c0ba7edc81ab4eb669fd71e89/mediapipe/python/solutions/pose_connections.py#L16
-# fmt: off
-POSE_CONNECTIONS = frozenset([(0, 1), (1, 2), (2, 3), (3, 7), (0, 4), (4, 5),
-                              (5, 6), (6, 8), (9, 10), (11, 12), (11, 13),
-                              (13, 15), (15, 17), (15, 19), (15, 21), (17, 19),
-                              (12, 14), (14, 16), (16, 18), (16, 20), (16, 22),
-                              (18, 20), (11, 23), (12, 24), (23, 24), (23, 25),
-                              (24, 26), (25, 27), (26, 28), (27, 29), (28, 30),
-                              (29, 31), (30, 32), (27, 31), (28, 32)])
-# fmt: on
-
 
 # Function to draw landmarks on the image
 def draw_landmarks_on_image(bgr_image, detection_result):
@@ -98,6 +93,9 @@ detector = vision.PoseLandmarker.create_from_options(options)
 # Open webcam video stream
 cap = cv2.VideoCapture(1)
 
+cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_GUI_NORMAL)
+cv2.setWindowProperty(WINDOW_NAME, cv2.WND_PROP_AUTOSIZE, cv2.WINDOW_AUTOSIZE)
+
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
@@ -106,6 +104,9 @@ while cap.isOpened():
 
     # Flip frame horizontally (like a mirror)
     frame = cv2.flip(frame, 1)
+
+    # Resize the frame to the desired dimensions
+    frame = resize_frame(frame, DESIRED_WIDTH, DESIRED_HEIGHT)
 
     # Convert frame to RGB format (as expected by MediaPipe)
     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -141,7 +142,7 @@ while cap.isOpened():
             annotated_frame = mask_rgb
 
     # Display the annotated frame
-    cv2.imshow("Pose Detection", annotated_frame)
+    cv2.imshow(WINDOW_NAME, annotated_frame)
 
     # Capture keypress to toggle segmentation mask display mode
     key = cv2.waitKey(5) & 0xFF

@@ -15,24 +15,13 @@ import mediapipe as mp
 from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.core import base_options as base_options_module
 
+from utils import resize_frame
+
+WINDOW_NAME = "Image Classification"
+
 # Height and width that will be used by the model
-DESIRED_HEIGHT = 480
-DESIRED_WIDTH = 480
-
-
-# Function to resize the frame to a fixed size
-def resize_frame(image):
-    h, w = image.shape[:2]
-    if h < w:
-        resized_image = cv2.resize(
-            image, (DESIRED_WIDTH, math.floor(h / (w / DESIRED_WIDTH)))
-        )
-    else:
-        resized_image = cv2.resize(
-            image, (math.floor(w / (h / DESIRED_HEIGHT)), DESIRED_HEIGHT)
-        )
-    return resized_image
-
+DESIRED_HEIGHT = 1280
+DESIRED_WIDTH = 832
 
 # --------------------------------------------------------------------------------
 
@@ -58,6 +47,10 @@ classifier = vision.ImageClassifier.create_from_options(options)
 # Open webcam video stream
 cap = cv2.VideoCapture(1)
 
+# reshape window
+cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_GUI_NORMAL)
+cv2.setWindowProperty(WINDOW_NAME, cv2.WND_PROP_AUTOSIZE, cv2.WINDOW_AUTOSIZE)
+
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
@@ -68,7 +61,7 @@ while cap.isOpened():
     frame = cv2.flip(frame, 1)
 
     # Resize the frame to the desired dimensions
-    resized_frame = resize_frame(frame)
+    resized_frame = resize_frame(frame, DESIRED_WIDTH, DESIRED_HEIGHT)
 
     # Convert the frame to RGB format (as expected by MediaPipe)
     rgb_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2RGB)
@@ -86,18 +79,18 @@ while cap.isOpened():
 
         # Put the classification result on the frame
         cv2.putText(
-            frame,
+            resized_frame,
             prediction_text,
-            org=(70, 70),  # bottom left corner of text
+            org=(30, 30),  # bottom left corner of text
             fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-            fontScale=2,
+            fontScale=.5,
             color=(0, 255, 0),
-            thickness=2,
+            thickness=1,
             lineType=cv2.LINE_AA,  # antialiased line
         )
 
     # Display the frame with the prediction
-    cv2.imshow("Image Classification", frame)
+    cv2.imshow(WINDOW_NAME, resized_frame)
 
     # Exit on pressing 'q'
     if cv2.waitKey(5) & 0xFF == ord("q"):
