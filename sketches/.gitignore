@@ -9,3 +9,6 @@
 # mediapipe & py5canvas clone for search & debug
 mediapipe
 py5canvas
+
+# canvas json
+cnv.*.json
