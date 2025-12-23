@@ -6,5 +6,6 @@
 # ruff
 .ruff_cache
 
-# mediapipe clone for search & debug
+# mediapipe & py5canvas clone for search & debug
 mediapipe
+py5canvas
