@@ -39,6 +39,8 @@ model = vision.HandLandmarker.create_from_options(options)
 video_size = 512
 video = VideoInput(1, size=(video_size, video_size))
 
+DRAW_SUBSETS = False
+
 
 def setup():
     create_canvas(video_size, video_size)
@@ -65,17 +67,8 @@ def draw():
         for i, lms in enumerate(result.hand_landmarks):
             pts = landmarks_to_px(lms)
 
-            # 1) Connections (white)
-            no_fill()
-            stroke(255)
-            stroke_weight(1.4)
-            draw_connections(pts, HAND_CONNECTIONS)
-
-            # 2) Joints (cyan dots)
-            no_stroke()
-            fill(0, 200, 255)
-            for x, y in pts:
-                circle((x, y), 3.8)
+            # Hand skeleton
+            draw_hand(pts, DRAW_SUBSETS)
 
             # 3) Handedness label following index finger tip (landmark #8)
             idx_tip = pts[8]  # index finger tip
@@ -86,12 +79,48 @@ def draw():
     pop()
 
 
+def key_pressed(key, mods=None):
+    """Toggle subset colouring with key '1'."""
+    global DRAW_SUBSETS
+    if key == "1":
+        DRAW_SUBSETS = not DRAW_SUBSETS
+
+
 # helpers ------------------------------------------------------------------------
 
 
 def landmarks_to_px(lms):
     """Convert one hand's landmarks to pixel coordinates in the video space."""
     return np.array([[lm.x * video_size, lm.y * video_size] for lm in lms], dtype=float)
+
+
+def draw_hand(pts, subsets=False):
+    """Draw the hand skeleton with optional per-finger colouring."""
+    no_fill()
+    stroke_weight(1.4)
+
+    if subsets:
+        stroke(255, 0, 255)  # palm
+        draw_connections(pts, HAND_PALM_CONNECTIONS)
+        stroke(0, 255, 255)  # thumb
+        draw_connections(pts, HAND_THUMB_CONNECTIONS)
+        stroke(255, 255, 0)  # index
+        draw_connections(pts, HAND_INDEX_FINGER_CONNECTIONS)
+        stroke(0, 128, 255)  # middle
+        draw_connections(pts, HAND_MIDDLE_FINGER_CONNECTIONS)
+        stroke(0, 200, 0)  # ring
+        draw_connections(pts, HAND_RING_FINGER_CONNECTIONS)
+        stroke(255, 0, 0)  # pinky
+        draw_connections(pts, HAND_PINKY_FINGER_CONNECTIONS)
+    else:
+        stroke(255)
+        draw_connections(pts, HAND_CONNECTIONS)
+
+    # Joints
+    no_stroke()
+    fill(0, 200, 255)
+    for x, y in pts:
+        circle((x, y), 3.8)
 
 
 def draw_connections(pts, connections):
