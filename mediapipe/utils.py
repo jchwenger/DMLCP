@@ -10,14 +10,38 @@ import cv2
 # --------------------------------------------------------------------------------
 
 
-# Function to resize the frame to a fixed size
-def resize_frame(image, width, height):
-    h, w = image.shape[:2]
-    if h < w:
-        resized_image = cv2.resize(image, (width, math.floor(h / (w / width))))
-    else:
-        resized_image = cv2.resize(image, (math.floor(w / (h / height)), height))
-    return resized_image
+def ensure_model(model_path, url):
+    """Ensure the model file exists locally; download it if missing."""
+    model_path.parent.mkdir(exist_ok=True)
+    if not model_path.exists():
+        print()
+        print(f"Downloading model from {url}...")
+        urllib.request.urlretrieve(url, model_path)
+        print(f"Model downloaded and saved as {model_path}")
+    return model_path
+
+
+def show_fps(
+    current_frame,
+    fps,
+    row_size=40,  # pixels
+    left_margin=24,  # pixels
+    text_color=(20, 60, 220),  # crimson (BGR)
+    font_size=2,
+    font_thickness=2,
+):
+    # Show the FPS
+    fps_text = "FPS = {:.1f}".format(fps)
+    text_location = (left_margin, row_size)
+    cv2.putText(
+        current_frame,
+        fps_text,
+        text_location,
+        cv2.FONT_HERSHEY_PLAIN,
+        font_size,
+        text_color,
+        font_thickness,
+    )
 
 
 # --------------------------------------------------------------------------------

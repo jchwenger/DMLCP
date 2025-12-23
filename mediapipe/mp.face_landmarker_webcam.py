@@ -14,7 +14,6 @@ import mediapipe as mp
 from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.core import base_options as base_options_module
 
-from utils import resize_frame
 
 from utils import DrawingSpec
 from utils import draw_landmarks
@@ -43,8 +42,8 @@ from utils import FACEMESH_RIGHT_EYEBROW
 # --------------------------------------------------------------------------------
 
 WINDOW_NAME = "Face Detection"
-DESIRED_HEIGHT = 1280
-DESIRED_WIDTH = 832
+DESIRED_HEIGHT = 800
+DESIRED_WIDTH = 600
 
 # Function to draw landmarks on the image
 def draw_landmarks_on_image(rgb_image, detection_result):
@@ -186,7 +185,7 @@ while cap.isOpened():
     frame = cv2.flip(frame, 1)
 
     # Resize the frame to the desired dimensions
-    resized_frame = resize_frame(frame, DESIRED_WIDTH, DESIRED_HEIGHT)
+    resized_frame = cv2.resize(frame, (DESIRED_HEIGHT, DESIRED_WIDTH))
 
     # Convert the frame to RGB and create MediaPipe Image
     rgb_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2RGB)

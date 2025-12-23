@@ -19,7 +19,6 @@ from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.components import containers
 
 from utils import _normalized_to_pixel_coordinates
-from utils import resize_frame
 
 # --------------------------------------------------------------------------------
 
@@ -40,8 +39,8 @@ NormalizedKeypoint = containers.keypoint.NormalizedKeypoint
 
 # Display configuration
 WINDOW_NAME = "Interactive Segmentation"
-DESIRED_HEIGHT = 1280
-DESIRED_WIDTH = 832
+DESIRED_HEIGHT = 800
+DESIRED_WIDTH = 600
 
 
 # Callback function to select point on mouse click
@@ -88,7 +87,7 @@ while cap.isOpened():
     # Flip frame horizontally (like a mirror)
     frame = cv2.flip(frame, 1)
 
-    resized_frame = resize_frame(frame, DESIRED_WIDTH, DESIRED_HEIGHT)
+    resized_frame = cv2.resize(frame, (DESIRED_HEIGHT, DESIRED_WIDTH))
     h, w = resized_frame.shape[:2]
 
     # Convert frame to RGB

@@ -15,13 +15,12 @@ import mediapipe as mp
 from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.core import base_options as base_options_module
 
-from utils import resize_frame
 
 WINDOW_NAME = "Image Classification"
 
 # Height and width that will be used by the model
-DESIRED_HEIGHT = 1280
-DESIRED_WIDTH = 832
+DESIRED_HEIGHT = 800
+DESIRED_WIDTH = 600
 
 # --------------------------------------------------------------------------------
 
@@ -61,7 +60,7 @@ while cap.isOpened():
     frame = cv2.flip(frame, 1)
 
     # Resize the frame to the desired dimensions
-    resized_frame = resize_frame(frame, DESIRED_WIDTH, DESIRED_HEIGHT)
+    resized_frame = cv2.resize(frame, (DESIRED_HEIGHT, DESIRED_WIDTH))
 
     # Convert the frame to RGB format (as expected by MediaPipe)
     rgb_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2RGB)

@@ -16,7 +16,8 @@ import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
-from utils import resize_frame
+from utils import ensure_model
+from utils import show_fps
 
 # --------------------------------------------------------------------------------
 
@@ -68,40 +69,6 @@ def visualize(image, detection_result) -> np.ndarray:
         )
 
     return image
-
-
-def ensure_model(model_path: pathlib.Path, url: str) -> pathlib.Path:
-    """Ensure the model file exists locally; download it if missing."""
-    model_path.parent.mkdir(exist_ok=True)
-    if not model_path.exists():
-        print()
-        print(f"Downloading model from {url}...")
-        urllib.request.urlretrieve(url, model_path)
-        print(f"Model downloaded and saved as {model_path}")
-    return model_path
-
-
-def show_fps(
-    current_frame,
-    fps,
-    row_size=40,  # pixels
-    left_margin=24,  # pixels
-    text_color=(20, 60, 220),  # crimson (BGR)
-    font_size=2,
-    font_thickness=2,
-):
-    # Show the FPS
-    fps_text = "FPS = {:.1f}".format(fps)
-    text_location = (left_margin, row_size)
-    cv2.putText(
-        current_frame,
-        fps_text,
-        text_location,
-        cv2.FONT_HERSHEY_PLAIN,
-        font_size,
-        text_color,
-        font_thickness,
-    )
 
 
 # --------------------------------------------------------------------------------
@@ -158,7 +125,7 @@ def run(args):
         frame = cv2.flip(frame, 1)
 
         # Resize the frame to the desired dimensions
-        resized_frame = resize_frame(frame, args.frame_width, args.frame_height)
+        resized_frame = cv2.resize(frame, (args.frame_width, args.frame_height))
 
         # Convert frame to RGB format (as expected by MediaPipe)
         rgb_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2RGB)
@@ -232,7 +199,7 @@ if __name__ == "__main__":
         help="Width of frame to capture from camera.",
         required=False,
         type=int,
-        default=1280,
+        default=800,
     )
 
     parser.add_argument(
@@ -240,7 +207,7 @@ if __name__ == "__main__":
         help="Height of frame to capture from camera.",
         required=False,
         type=int,
-        default=720,
+        default=600,
     )
 
     parser.add_argument(

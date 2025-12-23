@@ -28,7 +28,6 @@ from utils import HAND_MIDDLE_FINGER_CONNECTIONS
 from utils import HAND_RING_FINGER_CONNECTIONS
 from utils import HAND_PINKY_FINGER_CONNECTIONS
 from utils import HAND_CONNECTIONS
-from utils import resize_frame
 
 # --------------------------------------------------------------------------------
 
@@ -36,8 +35,8 @@ draw_subsets = False
 
 # Display configuration
 WINDOW_NAME = "Hand Detection"
-DESIRED_HEIGHT = 1280
-DESIRED_WIDTH = 832
+DESIRED_HEIGHT = 800
+DESIRED_WIDTH = 600
 
 # Text overlay constants
 MARGIN = 10  # pixels
@@ -210,7 +209,7 @@ while cap.isOpened():
     frame = cv2.flip(frame, 1)
 
     # Resize the frame to the desired dimensions
-    resized_frame = resize_frame(frame, DESIRED_WIDTH, DESIRED_HEIGHT)
+    resized_frame = cv2.resize(frame, (DESIRED_HEIGHT, DESIRED_WIDTH))
 
     # Convert the frame to RGB and create MediaPipe Image
     rgb_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2RGB)

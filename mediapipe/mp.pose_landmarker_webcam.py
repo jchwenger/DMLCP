@@ -23,7 +23,6 @@ from utils import DrawingSpec
 from utils import draw_landmarks
 
 from utils import POSE_CONNECTIONS
-from utils import resize_frame
 
 # --------------------------------------------------------------------------------
 
@@ -33,8 +32,8 @@ segmentation_mode = 0
 
 # Display configuration
 WINDOW_NAME = "Pose Detection"
-DESIRED_HEIGHT = 1280
-DESIRED_WIDTH = 832
+DESIRED_HEIGHT = 800
+DESIRED_WIDTH = 600
 
 # Drawing constants
 WHITE_COLOR = (224, 224, 224)
@@ -106,28 +105,23 @@ while cap.isOpened():
     frame = cv2.flip(frame, 1)
 
     # Resize the frame to the desired dimensions
-    frame = resize_frame(frame, DESIRED_WIDTH, DESIRED_HEIGHT)
+    resized_frame = cv2.resize(frame, (DESIRED_HEIGHT, DESIRED_WIDTH))
 
     # Convert frame to RGB format (as expected by MediaPipe)
-    rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    rgb_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2RGB)
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
 
     # Detect pose landmarks in the current frame
     detection_result = detector.detect(mp_image)
 
     # Draw pose landmarks on the frame (BGR image)
-    annotated_frame = draw_landmarks_on_image(frame, detection_result)
+    annotated_frame = draw_landmarks_on_image(resized_frame, detection_result)
 
     # Handle segmentation mask based on the current mode
     if detection_result.segmentation_masks:
         # Segmentation mask arrives in model output resolution; resize to frame.
         segmentation_mask = detection_result.segmentation_masks[0].numpy_view()
-        frame_h, frame_w = annotated_frame.shape[:2]
         mask_8u = (segmentation_mask * 255).astype(np.uint8)
-        if mask_8u.shape[:2] != (frame_h, frame_w):
-            mask_8u = cv2.resize(
-                mask_8u, (frame_w, frame_h), interpolation=cv2.INTER_LINEAR
-            )
         # Expand to 3 channels for blending or display.
         mask_rgb = np.repeat(mask_8u[:, :], 3, axis=2)
 
