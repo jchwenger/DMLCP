@@ -3,6 +3,7 @@
 
 import pathlib
 import urllib.request
+
 import mediapipe as mp
 from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.core import base_options as base_options_module

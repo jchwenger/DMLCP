@@ -6,6 +6,8 @@
 import pathlib
 import urllib.request
 
+import numpy as np
+
 import mediapipe as mp
 from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.core import base_options as base_options_module
@@ -29,6 +31,8 @@ from utils import FACEMESH_RIGHT_EYE
 from utils import FACEMESH_LEFT_EYEBROW
 from utils import FACEMESH_RIGHT_EYEBROW
 
+from py5canvas import *
+
 # --------------------------------------------------------------------------------
 
 # Path to the model file
@@ -47,9 +51,6 @@ options = vision.FaceLandmarkerOptions(
 model = vision.FaceLandmarker.create_from_options(options)
 
 # --------------------------------------------------------------------------------
-
-from py5canvas import *
-import numpy as np
 
 video_size = 512
 video = VideoInput(1, size=(video_size, video_size))

@@ -3,6 +3,9 @@
 
 import pathlib
 import urllib.request
+
+import numpy as np
+
 import mediapipe as mp
 from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.core import base_options as base_options_module
@@ -17,6 +20,8 @@ from utils import HAND_RING_FINGER_CONNECTIONS
 from utils import HAND_PINKY_FINGER_CONNECTIONS
 from utils import HAND_CONNECTIONS
 
+from py5canvas import *
+
 # mediapipe model ----------------------------------------------------------------
 
 # Path to the model file
@@ -30,9 +35,6 @@ options = vision.HandLandmarkerOptions(base_options=base_options, num_hands=2)
 model = vision.HandLandmarker.create_from_options(options)
 
 # --------------------------------------------------------------------------------
-
-from py5canvas import *
-import numpy as np
 
 video_size = 512
 video = VideoInput(1, size=(video_size, video_size))
