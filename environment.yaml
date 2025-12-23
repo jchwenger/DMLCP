@@ -16,6 +16,7 @@ dependencies:
   - ollama-python
   - markdown
   - ruff
+  - skimage
   - pip:
     - strip-markdown
     - py5canvas
