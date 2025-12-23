@@ -1,0 +1,22 @@
+name: dmlcp
+channels:
+  - pytorch
+  - conda-forge
+dependencies:
+  - python
+  - pip
+  - pytorch
+  - torchvision
+  - torchaudio
+  - jupyter
+  - matplotlib
+  - opencv
+  - pycairo
+  - ollama
+  - ollama-python
+  - markdown
+  - ruff
+  - pip:
+    - strip-markdown
+    - py5canvas
+    - mediapipe
