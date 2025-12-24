@@ -47,15 +47,15 @@ function setup() {
   // Create a pix2pix method with a pre-trained model
   // available styles:
   const modelURLs = {
-    "edges2cats": "https://rawcdn.githack.com/affinelayer/pix2pix-tensorflow-models/68fd4e2cf7fbf42ea82a379d49045416ebb857ec/edges2cats_AtoB.pict",
-    "edges2handbags": "https://rawcdn.githack.com/affinelayer/pix2pix-tensorflow-models/68fd4e2cf7fbf42ea82a379d49045416ebb857ec/edges2handbags_AtoB.pict",
-    "edges2pikachu": "https://rawcdn.githack.com/ml5js/pix2pix_models/68d7bc4288c1f8aa23e17d0f2b222689380a22a1/edges2pikachu_AtoB.pict",
-    "edges2shoes": "https://rawcdn.githack.com/affinelayer/pix2pix-tensorflow-models/68fd4e2cf7fbf42ea82a379d49045416ebb857ec/edges2shoes_AtoB.pict",
-    "facades": "https://rawcdn.githack.com/affinelayer/pix2pix-tensorflow-models/68fd4e2cf7fbf42ea82a379d49045416ebb857ec/facades_BtoA.pict"
+    "edges2pikachu": "https://rawcdn.githack.com/jchwenger/ml5-data-and-models/f3ec7c10db635d1e591d587e4f053395f6d8fb85/models/pix2pix/edges2pikachu_AtoB.pict",
+    "edges2cats": "https://rawcdn.githack.com/jchwenger/ml5-data-and-models/f3ec7c10db635d1e591d587e4f053395f6d8fb85/models/pix2pix/edges2cats_AtoB.pict",
+    "edges2shoes": "https://rawcdn.githack.com/jchwenger/ml5-data-and-models/f3ec7c10db635d1e591d587e4f053395f6d8fb85/models/pix2pix/edges2shoes_AtoB.pict",
+    "edges2handbags": "https://rawcdn.githack.com/jchwenger/ml5-data-and-models/f3ec7c10db635d1e591d587e4f053395f6d8fb85/models/pix2pix/edges2handbags_AtoB.pict",
+    "facades": "https://rawcdn.githack.com/jchwenger/ml5-data-and-models/f3ec7c10db635d1e591d587e4f053395f6d8fb85/models/pix2pix/facades_BtoA.pict"
   }
   // urls found here: https://github.com/khanniie/mldraw/blob/cd1d58a73f659ba494fff06a765446d0d9aa4931/frontend/src/local-models.ts#L9
-  // from these two repos:
-  // https://github.com/affinelayer/pix2pix-tensorflow-models
+  // originally from these two repos:
+  // https://github.com/affinelayer/pix2pix-tensorflow-models (no longer available)
   // https://github.com/ml5js/ml5-data-and-models/tree/main/models/pix2pix
   const style = "facades";
   pix2pix = ml5.pix2pix(modelURLs[style], modelLoaded);
