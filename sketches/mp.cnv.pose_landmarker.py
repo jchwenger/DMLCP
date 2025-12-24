@@ -1,5 +1,12 @@
+# --------------------------------------------------------------------------------
+
 # Pose landmarks with:
 # https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker
+
+# Commands:
+#   - '1' to toggle pose segmentation mask
+#     (0: no mask, 1: mask only, 2: mask with transparency)
+# --------------------------------------------------------------------------------
 
 import pathlib
 import urllib.request
@@ -12,11 +19,12 @@ from utils import ensure_model
 
 from utils import POSE_CONNECTIONS
 
-# mediapipe model ----------------------------------------------------------------
+# --------------------------------------------------------------------------------
 
 # Path to the model file
-model_path = pathlib.Path("models/pose_landmarker.task")
-url = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_heavy/float16/latest/pose_landmarker_heavy.task"
+model_path = pathlib.Path("models/pose_landmarker_lite.task")
+# see other models here: https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker#models
+url = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/latest/pose_landmarker_lite.task"
 model_path = ensure_model(model_path, url)
 
 # Initialize MediaPipe HandLandmarker

@@ -1,4 +1,8 @@
 # --------------------------------------------------------------------------------
+
+# Object detection with:
+# https://ai.google.dev/edge/mediapipe/solutions/vision/object_detector
+
 # Commands:
 #   - 'q' to quit
 # --------------------------------------------------------------------------------
@@ -34,8 +38,9 @@ FONT_THICKNESS = 2
 RECT_COLOR = (255, 0, 0)  # blue (BGR)
 TEXT_COLOR = (255, 255, 255)  # white
 
-model_path = pathlib.Path("models/efficientdet.tflite")
-url = "https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/int8/1/efficientdet.tflite"
+model_path = pathlib.Path("models/efficientdet_lite0.tflite")
+# see other models here: https://ai.google.dev/edge/mediapipe/solutions/vision/object_detector
+url = "https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/int8/latest/efficientdet_lite0.tflite"
 model_path = ensure_model(model_path, url)
 
 

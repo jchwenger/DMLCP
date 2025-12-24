@@ -1,5 +1,9 @@
+# --------------------------------------------------------------------------------
+
 # Object detection with:
 # https://ai.google.dev/edge/mediapipe/solutions/vision/object_detector
+
+# --------------------------------------------------------------------------------
 
 import time
 import pathlib
@@ -25,8 +29,9 @@ SHOW_FPS = False
 FPS_AVG_FRAME_COUNT = 10
 
 # Path to the model file
-model_path = pathlib.Path("models/efficientdet.tflite")
-url = "https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/int8/1/efficientdet.tflite"
+model_path = pathlib.Path("models/efficientdet_lite0.tflite")
+# see other models here: https://ai.google.dev/edge/mediapipe/solutions/vision/object_detector
+url = "https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/int8/latest/efficientdet_lite0.tflite"
 model_path = ensure_model(model_path, url)
 
 # Initialize ObjectDetector

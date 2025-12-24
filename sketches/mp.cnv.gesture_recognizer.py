@@ -1,5 +1,9 @@
+# --------------------------------------------------------------------------------
+
 # Hand gesture recognition with:
 # https://ai.google.dev/edge/mediapipe/solutions/vision/gesture_recognizer
+
+# --------------------------------------------------------------------------------
 
 import pathlib
 
@@ -20,10 +24,11 @@ from utils import HAND_CONNECTIONS
 
 from py5canvas import *
 
-# mediapipe model ----------------------------------------------------------------
+# --------------------------------------------------------------------------------
 
 # Path to the model file
 model_path = pathlib.Path("models/gesture_recognizer.task")
+# see models here: https://ai.google.dev/edge/mediapipe/solutions/vision/gesture_recognizer#models
 url = "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/latest/gesture_recognizer.task"
 model_path = ensure_model(model_path, url)
 

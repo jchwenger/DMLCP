@@ -102,6 +102,7 @@ def result_callback(result, timestamp_ms):
 
 # Path to the model file
 model_path = pathlib.Path("models/yamnet.tflite")
+# see models here: https://ai.google.dev/edge/mediapipe/solutions/audio/audio_classifier#models
 url = "https://storage.googleapis.com/mediapipe-models/audio_classifier/yamnet/float32/latest/yamnet.tflite"
 model_path = ensure_model(model_path, url)
 

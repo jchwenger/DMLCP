@@ -1,5 +1,8 @@
 # --------------------------------------------------------------------------------
 
+# Hand gesture recognition with:
+# https://ai.google.dev/edge/mediapipe/solutions/vision/gesture_recognizer
+
 # Commands:
 #   - 'q' to quit
 #   - '1' to toggle hand colours
@@ -213,6 +216,7 @@ def draw_landmarks_and_gestures_on_image(
 
 # Path to the model file
 model_path = pathlib.Path("models/gesture_recognizer.task")
+# see models here: https://ai.google.dev/edge/mediapipe/solutions/vision/gesture_recognizer#models
 url = "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/latest/gesture_recognizer.task"
 model_path = ensure_model(model_path, url)
 

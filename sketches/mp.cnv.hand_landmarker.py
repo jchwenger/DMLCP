@@ -1,5 +1,9 @@
+# --------------------------------------------------------------------------------
+
 # Hand landmarks and handedness label detection with:
 # https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker
+
+# --------------------------------------------------------------------------------
 
 import pathlib
 import urllib.request
@@ -22,10 +26,11 @@ from utils import HAND_CONNECTIONS
 
 from py5canvas import *
 
-# mediapipe model ----------------------------------------------------------------
+# --------------------------------------------------------------------------------
 
 # Path to the model file
 model_path = pathlib.Path("models/hand_landmarker.task")
+# see models here: https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker#models
 url = "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task"
 model_path = ensure_model(model_path, url)
 

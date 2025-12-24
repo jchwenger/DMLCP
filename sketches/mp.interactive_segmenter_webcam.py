@@ -1,8 +1,13 @@
 # --------------------------------------------------------------------------------
+
+# Interactive segmentation with:
+# https://ai.google.dev/edge/mediapipe/solutions/vision/interactive_segmenter
+
 # Commands:
-#   - '1' to toggle foreground mask
-#   - '2' to toggle background mask
-#     (0: no mask, 1: mask only, 2: mask with transparency)
+# - click to change selection point
+# - '1' to toggle foreground mask
+# - '2' to toggle background mask
+#   (0: no mask, 1: mask only, 2: mask with transparency)
 # --------------------------------------------------------------------------------
 
 import math
@@ -54,8 +59,8 @@ def click_event(event, x, y, flags, param):
 # --------------------------------------------------------------------------------
 
 # Path to the model file
-model_path = pathlib.Path("models/interactive_segmenter.tflite")
-url = "https://storage.googleapis.com/mediapipe-models/interactive_segmenter/magic_touch/float32/1/magic_touch.tflite"
+model_path = pathlib.Path("models/magic_touch.tflite")
+url = "https://storage.googleapis.com/mediapipe-models/interactive_segmenter/magic_touch/float32/latest/magic_touch.tflite"
 model_path = ensure_model(model_path, url)
 
 # Initialize ImageSegmenter

@@ -1,4 +1,8 @@
 # --------------------------------------------------------------------------------
+
+# Image classification with:
+# https://ai.google.dev/edge/mediapipe/solutions/vision/image_classifier
+
 # Commands:
 #   - 'q' to quit
 # --------------------------------------------------------------------------------
@@ -24,8 +28,9 @@ DESIRED_HEIGHT = 800
 DESIRED_WIDTH = 600
 
 # Path to the model file
-model_path = pathlib.Path("models/classifier.tflite")
-url = "https://storage.googleapis.com/mediapipe-models/image_classifier/efficientnet_lite0/float32/1/efficientnet_lite0.tflite"
+model_path = pathlib.Path("models/efficientnet_lite0.tflite")
+# also available as /int8/ instead of /float32/, see here: https://ai.google.dev/edge/mediapipe/solutions/vision/image_classifier/index#efficientnet-lite0_model_recommended
+url = "https://storage.googleapis.com/mediapipe-models/image_classifier/efficientnet_lite0/float32/latest/efficientnet_lite0.tflite"
 model_path = ensure_model(model_path, url)
 
 # Initialize MediaPipe ImageClassifier

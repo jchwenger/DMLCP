@@ -1,7 +1,9 @@
-# mediapipe model ----------------------------------------------------------------
+# --------------------------------------------------------------------------------
 
 # Face landmark detection using:
 # https://ai.google.dev/edge/mediapipe/solutions/vision/face_landmarker
+
+# --------------------------------------------------------------------------------
 
 import pathlib
 import urllib.request
@@ -37,6 +39,7 @@ from py5canvas import *
 
 # Path to the model file
 model_path = pathlib.Path("models/face_landmarker.task")
+# see other models here: https://ai.google.dev/edge/mediapipe/solutions/vision/face_landmarker#models
 url = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker.task"
 model_path = ensure_model(model_path, url)
 
