@@ -53,7 +53,7 @@ print(
 print("----------------------------------------")
 
 video_size = 512
-video = VideoInput(1, size=(video_size, video_size))
+video = VideoInput(1, size=(video_size, video_size), flipped=True)
 
 DRAW_SUBSETS = False
 
@@ -157,7 +157,9 @@ def handedness_label(handedness_list, idx):
     """Extract 'Left' or 'Right' for a given hand index."""
     try:
         hd = handedness_list[idx]
-        return hd[0].category_name
+        if hd:
+            # correct for flipping of camera
+            return "Right" if hd[0].category_name == "Left" else "Left"
     except Exception as e:
         print(f"Error occurred retrieving handedness: {e}")
         return None
@@ -169,9 +171,9 @@ def gesture_label(gesture_list, idx):
         gest = gesture_list[idx]
         if gest:
             return gest[0].category_name
-    except Exception:
-        pass
-    return None
+    except Exception as e:
+        print(f"Error occurred retrieving gesture label: {e}")
+        return None
 
 
 def draw_label(anchor_xy, text_str):

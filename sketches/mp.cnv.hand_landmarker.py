@@ -37,7 +37,7 @@ model = vision.HandLandmarker.create_from_options(options)
 # --------------------------------------------------------------------------------
 
 video_size = 512
-video = VideoInput(1, size=(video_size, video_size))
+video = VideoInput(1, size=(video_size, video_size), flipped=True)
 
 DRAW_SUBSETS = False
 
@@ -135,8 +135,11 @@ def handedness_label(result, hand_index):
     """
     try:
         hd = result.handedness[hand_index]
-        return hd[0].category_name
-    except Exception:
+        if hd:
+            # correct for flipping of camera
+            return "Right" if hd[0].category_name == "Left" else "Left"
+    except Exception as e:
+        print(f"Error occurred retrieving handedness: {e}")
         return None
 
 
