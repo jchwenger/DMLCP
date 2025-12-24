@@ -2,27 +2,34 @@
 
 Here are some [slides on Python Installation & environments](https://docs.google.com/presentation/d/1aTYSvpuYaE_dPIWwT_HEcYve7fsYpDtzix74d5-NvC4/edit?usp=sharing).
 
-## 1. Python
+## 1. Python: Miniforge
 
-**Note**: 
+The recommended path to install Python for all platforms is through [Miniforge](https://github.com/conda-forge/miniforge?tab=readme-ov-file#install) (as this includes `mamba`, see below).
 
-Instructions to follow for:
-- Linux: included;
-- MacOS: [download the installer](https://www.python.org/downloads/macos/)
-- [Windows](https://docs.python.org/3/using/windows.html)
+On Windows, I recommend allowing Miniforge to be your primary Python provider and adding it to the PATH of all terminals (so you can access `mamba/conda` in them).
 
-The overall [download](https://www.python.org/downloads/) page.
+Once this is installed, in a terminal, install the course dependencies:
 
-## Miniconda/Anaconda/Miniforge/Mamba
+```bash
+conda env create -f environment.yml
+```
 
-For managing Python environment (and more), use conda! Works on Linux/MacOS/Windows.
+If you need to update the environment using the YAML file, do this:
 
-- [Miniforge](https://github.com/conda-forge/miniforge), recommended for Mac M1/2/3 users (this currently includes `mamba`, just below).
-- [Mamba](https://mamba.readthedocs.io/en/latest/installation/mamba-installation.html), a C++ reimplementation of `conda`, the package manager of Anaconda. Still in development, but resolves issues of speed found in Anaconda.
-- [Miniconda](https://docs.conda.io/en/latest/miniconda.html), the minimal install, CLI only, for Anaconda below
-- [Anaconda](https://www.anaconda.com/), the full install (only recommended if you use it elsewhere or are only comfortable with GUI software)
+```bash
+conda env update -f environment.yml
+```
 
-Installation instructions in the above links.
+You can obviously add dependencies manually, but **always** check that your environment is active: see **Checking your installation**.
+
+### Anaconda/Miniconda/Miniforge: A History
+
+For managing Python environment (and more), use mamba (faster replacement of conda)! Works on Linux/MacOS/Windows.
+
+The very short history of all these names are:
+- First came [Anaconda](https://www.anaconda.com/) – another big snake, like Python –, which is the full install (only recommended if you use it elsewhere or are only comfortable with GUI software);
+- Then [Miniconda](https://docs.conda.io/en/latest/miniconda.html), the minimal install, CLI only;
+- Then given the slowness of `conda` due to many different [channels](https://www.anaconda.com/docs/getting-started/concepts/what-is-a-channel) and dependencies conflict, one channel, [Conda Forge](https://conda-forge.org/), decided to create their own minimal and fast 'Anaconda' called [Miniforge](https://github.com/conda-forge/miniforge?tab=readme-ov-file#install) (originally Mambaforge), using this channel as a priority, and developing their own reimplementation of `conda`, [`mamba`](https://mamba.readthedocs.io/en/latest/installation/mamba-installation.html) (smaller snake, faster since it's a C++ reimplementation of `conda`).
 
 ### Checking your installation
 
@@ -52,27 +59,29 @@ A [conda environment](https://docs.conda.io/projects/conda/en/latest/user-guide/
 
 ### Creating the environment
 
-Open a terminal/console and type (`--name` and `-n` are equivalent, you can list flags with `conda --help`): 
+Open a terminal/console and type (`--name` and `-n` are equivalent, you can list flags with `conda/mamba --help`): 
 
 ```bash
-$ conda create --name dmlcp python
+# using mamba is faster than conda
+$ mamba create --name test-env python
 ```
 
-This will specifies the Python version and its name 'dmlcp' ('Data and Machine Learning for Creative Practice'). Feel free to choose some other name if you prefer. 
+This will specifies the Python version and its name 'test-env'. Feel free to choose some other name if you prefer. 
 
 Activate it by typing:
 
 ```bash
-$ conda activate dmlcp
+$ conda activate test-env
 ```
 
 Now your console *should* indicate the environment in some way or other. We can install a package (the `-c conda-forge` specifies a *channel*, again a way of controlling dependencies: a bit like getting your version of the program from one supermarket). You can add the `-y` flag if you don't want conda to wait for your approval.
 
 ```bash
-(dmlcp) $ conda install -c conda-forge jupyter
+# using mamba is faster for installs
+(test-env) $ mamba install -c conda-forge jupyter
 ```
 
-The package is now installed **only** in your environment `dmlcp`. From now on, make sure you always activate this environment when working on the lab/project activities of this module!
+The package is now installed **only** in your environment `test-env`. From now on, make sure you always activate this environment when working on the lab/project activities of this module!
 
 ### Checking what packages are installed in your environment
 
@@ -91,13 +100,14 @@ $ conda list | grep torch # pytorch, torchvision, etc.
 Remove the package `scipy` from the currently-active environment:
 
 ```bash
-$ conda remove scipy
+# always faster to use mamba for install/remove
+$ mamba remove scipy
 ```
 
 Remove a list of packages from an environemnt 'myenv':
 
 ```bash
-$ conda remove -n myenv scipy curl wheel
+$ mamba remove -n myenv scipy curl wheel
 ```
 
 ### Listing all your conda environments
@@ -126,13 +136,12 @@ Pip is Python's package manager (like `npm` for JavaScript)
 To create an environment *only for a specific project*:
 ```bash
 $ cd my-project # go to that folder
-$ mkdir env # create a (usually hidden) folder for the env files
-$ python3 -m venv env --prompt my-project # creates your pip environment
-$ source env/bin/activate                 # without --prompt, my environment will be called 'env'
+$ python3 -m venv .venv --prompt my-project # creates your pip environment (`.venv`: the dot means hidden folder)
+$ source .venv/bin/activate                 # without --prompt, my environment will be called '.venv'
 (my-project) $ which pip  # pip will now be in my-project/bin/pip, a local copy
 ```
 
-Everything relating to this environment is contained in the `env` folder.
+Everything relating to this environment, including the Python source code, is contained in the `.venv` folder.
 
 To deactivate:
 ```bash
@@ -141,7 +150,7 @@ To deactivate:
 
 To delete all traces of your environment, start from zero, etc.
 ```bash
-rm -rf env # inside `my-project``, simply delete the folder with env files
+rm -rf .venv # inside `my-project`, simply delete the folder with .venv files
 ```
 
 ### **!! NOTE: When you run python3 -m venv, it will create an environment with the same version of Python as the one used when invoking the command! To use another version, you need to have it installed, then use python3.11 -m venv...**
@@ -167,7 +176,11 @@ Pip and conda are both used to install packages but:
 
 Both create environments, however pip works *project-wise*, whereas conda works *system-wise*.
 
-Often, what you want to do is create a conda environment, then use `pip` to install things quickly (and if everything is messed up, you can just remove the env entirely and start from scratch).
+Often, what you want to do is create a conda environment, then use `pip` to install things quickly (and if everything is messed up, you can just remove the .venv entirely and start from scratch).
+
+## 2.4 uv
+
+If you want to create Python-only projects, I highly recommend learning to use Astral's [`uv`](https://docs.astral.sh/uv/), that works a bit like `npm`/`nvm` for JavaScript, but for Python. I don't use it here because we need non-Python dependencies, for which `mamba` makes things easier.
 
 ## 3. Jupyter & Google Colab
 
@@ -211,84 +224,21 @@ drive.mount('/content/drive/')
 
 ### PyTorch
 
-Select the correct set-up [here](https://pytorch.org/get-started/locally/) and use the appropriate installation command.
+Ships with the repo environment, but if ever you need to install it in another one, select the correct set-up [here](https://pytorch.org/get-started/locally/) and use the appropriate installation command.
 
-#### Installing PyTorch on Mac M1/M2
-
-If you are working on a Mac M1/2/3 (nice!), **Anaconda/Miniconda will not work, you will need to use Miniforge instead!**
-
-If you need to uninstall Anaconda/Miniconda, use [these instructions](https://docs.anaconda.com/anaconda/install/uninstall/).
-
-[Here](https://developer.apple.com/metal/pytorch/) are installations for PyTorch and Silicon acceleration.
 
 ### Huggingface/Gradio
 
-Huggingface [recommends pip for their installation](https://huggingface.co/docs/transformers/installation)
+Ships with the repo environment, but if ever you need to install it in another one, Huggingface [recommends pip for their installation](https://huggingface.co/docs/transformers/installation).
 
-```bash
-# all the Huggingface things
-pip install --upgrade transformers diffusers datasets accelerate
-```
+And [so does Gradio](https://www.gradio.app/guides/quickstart).
 
-And [so does Gradio](https://www.gradio.app/guides/quickstart):
-
-```bash
-pip install gradio
-```
-
-## 5. Other dependencies
-
-Here are instructions to install the other required dependencies for the DMLCP course. This assumes you followed the Python and Conda setup instructions and installed PyTorch by following the instructions above. Repeating these steps if all or some of the dependencies are already satisfied should cause no problem.
-
-Conda is known for having speed issues, and against that there are two possibilities:
-- use pip inside your conda environment: pip does not check dependencies, but it's fine, since you can just delete the environment and rebuild one if things go wrong.
-- use something like `mamba`, that is much faster.
-
-Now first make sure your environment is active `conda activate dmlcp`, then you can use `conda install -c conda-forge` to install the following packages:
-
-- essentials
-```bash
-    jupyter numpy matplotlib pillow
-```
-- required by canvas:
-```bash
-    pycairo
-```
--  image manipulation library
-```bash
-    opencv
-```
-- for `scikit-image`, use the Anaconda channel:
-```bash
-     conda install -c anaconda scikit-image 
-```
-- for `Py5Canvas` you also need pyglet:
-```bash
-pip install pyglet
-```
-- for the scraping notebooks:
-```bash
-    beautifulsoup4 selenium
-```
--  for creating gifs in the DCGAN notebooks
-```bash
-    imageio
-```
-
-#### Note! That you may not need all of them. One good habit to gain is not to freak out when seeing an error saying a package isn't present, and install it when you need it.
 
 ### Canvas
 
-If you have the `canvas.py` file in the same folder as a notebook importing it (and you've installed `pycairo`), everything will work. If you want to install [py5canvas](https://github.com/colormotor/py5canvas) on your system, open a terminal and write:
+[py5canvas](https://github.com/colormotor/py5canvas), a p5.js-like creative coding library developed by Daniel Berio here at Goldsmiths, also ships with the repo environment.
 
-```
-git clone https://github.com/colormotor/py5canvas.git
-cd py5canvas
-pip install -e .
-```
-
-(See [here](https://stackoverflow.com/a/59562571)). To update py5canvas to the latest version, navigate to the `py5canvas` directory in the terminal (using `cd`) and then:  `git pull`.
-
+To install on Colab, follow [these instructions](https://github.com/colormotor/py5canvas?tab=readme-ov-file#installing-on-google-colab).
 
 ## 6. Git
 
@@ -355,7 +305,7 @@ It's nice. Do it. 💖
 
 ### Windows Users: Install Bash on your machine!
 
-Bash is the command line interface running on Linux and Mac. There are many tutorials on how to install this on Windows. Send me your favourite!
+Bash is the command line interface running on Linux and Mac. Install it [here](https://git-scm.com/install/windows).
 
 It's nice. Do it. 💖
 
@@ -369,9 +319,11 @@ It's nice. Do it. 💖
 
 ## 8. ffmpeg tricks
 
-Install ffmpeg with [conda](https://anaconda.org/conda-forge/ffmpeg):
+It ships with the repo environment, but can easily be installed with `mamba` in another env:
 
-`conda install -c conda-forge ffmpeg`
+```bash
+mamba install ffmpeg
+```
 
 Visit [ffmpeg.org](https://ffmpeg.org) for reference on how to record, convert and stream audio and video.
 
