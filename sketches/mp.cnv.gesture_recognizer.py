@@ -157,12 +157,10 @@ def handedness_label(handedness_list, idx):
     """Extract 'Left' or 'Right' for a given hand index."""
     try:
         hd = handedness_list[idx]
-        categories = getattr(hd, "categories", hd)
-        if categories:
-            return categories[0].category_name
-    except Exception:
-        pass
-    return None
+        return hd[0].category_name
+    except Exception as e:
+        print(f"Error occurred retrieving handedness: {e}")
+        return None
 
 
 def gesture_label(gesture_list, idx):

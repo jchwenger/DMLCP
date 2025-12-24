@@ -135,11 +135,7 @@ def handedness_label(result, hand_index):
     """
     try:
         hd = result.handedness[hand_index]
-        # Either a list-like [Category, ...] or an object with .categories
-        if hasattr(hd, "categories"):
-            return hd.categories[0].category_name
-        else:
-            return hd[0].category_name
+        return hd[0].category_name
     except Exception:
         return None
 
