@@ -11,7 +11,6 @@
 # --------------------------------------------------------------------------------
 
 import math
-import urllib
 import pathlib
 
 import numpy as np

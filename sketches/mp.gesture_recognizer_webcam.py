@@ -8,7 +8,6 @@
 #   - '1' to toggle hand colours
 # --------------------------------------------------------------------------------
 
-import urllib
 import pathlib
 import dataclasses
 

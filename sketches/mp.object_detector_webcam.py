@@ -9,7 +9,6 @@
 
 import time
 import pathlib
-import urllib.request
 
 import numpy as np
 

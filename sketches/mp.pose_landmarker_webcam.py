@@ -8,7 +8,6 @@
 #     (0: no mask, 1: mask only, 2: mask with transparency)
 # --------------------------------------------------------------------------------
 
-import urllib
 import pathlib
 import dataclasses
 

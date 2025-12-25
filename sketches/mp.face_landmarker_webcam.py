@@ -7,7 +7,6 @@
 #   - 'q' to quit
 # --------------------------------------------------------------------------------
 
-import urllib
 import pathlib
 
 import numpy as np

@@ -9,7 +9,6 @@
 # --------------------------------------------------------------------------------
 
 import pathlib
-import urllib.request
 
 import mediapipe as mp
 from mediapipe.tasks.python import vision

@@ -1,8 +1,12 @@
+# --------------------------------------------------------------------------------
+
 # Audio classification with:
 # https://ai.google.dev/edge/mediapipe/solutions/audio/audio_classifier
 
-import pathlib
+# --------------------------------------------------------------------------------
+
 import time
+import pathlib
 import threading
 
 import numpy as np

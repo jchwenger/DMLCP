@@ -1,5 +1,4 @@
 import os
-import urllib
 import pathlib
 
 from PIL import Image
