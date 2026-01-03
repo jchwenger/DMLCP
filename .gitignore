@@ -2,9 +2,9 @@
 .DS_Store
 
 # Python folders
-python/datasets
-python/generated
-python/scraped-images
+notebooks/datasets
+notebooks/generated
+notebooks/scraped-images
 
 # python venv folders
 env
