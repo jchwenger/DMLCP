@@ -18,6 +18,7 @@ dependencies:
   - ruff
   - scikit-image
   - gdown
+  - gradio
   - pip:
     - strip-markdown
     - py5canvas
