@@ -1,23 +1,22 @@
 /*
-  Data and machine learning for creative practice (DMLCP)
-
-  Object detection on a static image
-
-  (Deprecated: this is not using ml5js v1!)
-  Original sketch: https://editor.p5js.org/ml5/sketches/ObjectDetector_COCOSSD_single_image
-  Reference here: https://archive-docs.ml5js.org/#/reference/object-detector
-  And other examples: https://archive-docs.ml5js.org/#/reference/object-detector?id=examples
-*/
+ *  Data and machine learning for creative practice (DMLCP)
+ *
+ *  Object detection on a static image
+ *
+ *  Source: https://github.com/ml5js/ml5-next-gen/tree/main/examples/objectDetection-image-p5-2.0
+ *  Documentation: https://docs.ml5js.org/#/reference/object-detection
+ */
 
 let detector,
     pic,
-    detections = [];
+    detections = [],
+    hasDetected = false; // switch to log only once
 
-// Load our model & image before setup
-function preload() {
+async function setup() {
+
   // Load our object dection model `cocossd` – you could use `yolo`
-  detector = ml5.objectDetector('cocossd');
-  pic = loadImage('images/dog.jpg');
+  detector = await ml5.objectDetection('cocossd');
+  pic = await loadImage('images/dog_cat.jpg');
 
   // Load our image, try the other ones in the directory!
   // IDEA: import, or even create, your own images, see what the model is able
@@ -30,9 +29,6 @@ function preload() {
   //       display both predictions? Ideally you'd want to make clear to the
   //       user which model predicted which bounding box?
 
-}
-
-function setup() {
   createCanvas(pic.width, pic.height);
 
   // IDEA: here, instead of using an existing image, you could *create one*
@@ -51,7 +47,7 @@ function setup() {
 
   console.log("Setting up, about to detect...");
   // start our detector, give the callback function of gotResults()
-  detector.detect(pic, gotResults);
+  detector.detectStart(pic, gotResults);
 }
 
 function draw() {
@@ -102,13 +98,12 @@ function draw() {
 }
 
 // Our callback function!
-function gotResults(err, results) {
-  if (err) {
-    console.log("We had an error with the detection:", err);
-    return;
-  }
+function gotResults(results) {
   // Remember our detections so that we can draw them in draw()
   detections = results;
-  console.log("Huzzah! It detected!");
-  console.log(detections); // if you want to see what `detections` look like
+  if (!hasDetected) {
+    console.log("Huzzah! It detected!");
+    console.log(detections); // if you want to see what `detections` look like
+    hasDetected = true;
+  }
 }

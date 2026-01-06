@@ -1,39 +1,32 @@
 /*
-  Data and machine learning for creative practice (DMLCP)
-
-  Object detection with a Webcam
-
-  (Deprecated: this is not using ml5js v1!)
-  Original sketch: https://editor.p5js.org/ml5/sketches/ObjectDetector_COCOSSD_Video
-  Reference here: https://archive-docs.ml5js.org/#/reference/object-detector
-  And other examples: https://archive-docs.ml5js.org/#/reference/object-detector?id=examples
-*/
+ *  Data and machine learning for creative practice (DMLCP)
+ *
+ *  Object detection with a Webcam
+ *
+ * Source:  https://github.com/ml5js/ml5-next-gen/tree/main/examples/objectDetection-webcam-p5-2.0
+ * Documentation: https://docs.ml5js.org/#/reference/object-detection
+ */
 
 let video,
     detector,
     detections = [];
 
-function preload() {
-  // Load our object dection model `cocossd` – you could use 'yolo'
-  detector = ml5.objectDetector('cocossd');
-}
+async function setup() {
 
-function setup() {
+  // Load our object dection model `cocossd` – you could use 'yolo'
+  detector = await ml5.objectDetection('cocossd');
+
   createCanvas(640, 480);
 
   // Load our webcam feed, when the video is ready the videoReady callback will
   // be called
-  video = createCapture(VIDEO, videoReady);
-  video.size(640, 480);
+  video = createCapture(VIDEO);
+  video.size(width, height);
   video.hide();
+
+  detector.detectStart(video, gotResults);
 }
 
-function videoReady(stream) {
-  // We now know the video is ready, so we'll start the detection.
-  // Start our detector, pass in the callback function 'gotResults' called once
-  // the detection is done
-  detector.detect(video, gotResults);
-}
 
 function draw() {
   background(0);
@@ -85,32 +78,16 @@ function draw() {
   }
 }
 
-// we can use mouseClicked to
-function mouseClicked() {
-  if (detector && video) {
-    // the model returns a Promise, see:
-    // https://www.youtube.com/playlist?list=PLRqwX-V7Uu6bKLPQvPRNNE65kBL62mVfx
-    detector.detect(video)
-      .then((res) => {
-        console.log(res); // one detection
-      });
-  } else {
-    console.log("Model or video not ready yet...");
-  }
-}
-
-function gotResults(err, results) {
-  if (err) {
-    console.log("We had an error with the detection:", err);
-  }
-
+function gotResults(results) {
   // Remember our detections so that we can draw them in draw()
   detections = results;
 
-  // Recursion! <3 By default, no new detection will be done so we need to
-  // restart the detection again (as we did in videoReady(...)) to keep
-  // detecting each frame:
-  detector.detect(video, gotResults);
+}
+
+// we can use mouseClicked to log the results
+function mouseClicked() {
+  console.log("Detection results:");
+  console.log(detections);
 }
 
 // IDEA: (advanced) One could imagine modifying this sketch to use a 'friend'
