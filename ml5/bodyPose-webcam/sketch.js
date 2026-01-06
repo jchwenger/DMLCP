@@ -16,18 +16,18 @@
 
 let video,
     bodyPose,
-    poses,
-    connections;
+    poses = [],
+    connections = [];
 
-function preload() {
-  bodyPose = ml5.bodyPose();
-  // 'MoveNet' by default, try also : 'BlazePose'
-  // see: https://docs.ml5js.org/#/reference/bodypose?id=ml5bodypose
-}
-
-function setup() {
+async function setup() {
 
   createCanvas(640, 480);
+
+  bodyPose = await ml5.bodyPose();
+  // 'MoveNet' by default, try also : 'BlazePose'
+  // see: https://docs.ml5js.org/#/reference/bodypose?id=ml5bodypose
+
+  // Create the video and hide it
   video = createCapture(VIDEO);
   video.hide();
 
@@ -36,13 +36,6 @@ function setup() {
 
   // Get the skeleton connection information
   connections = bodyPose.getSkeleton();
-
-}
-
-function gotPoses(results) {
-
-  // `results` is an array (the model can detect more than one person!)
-  poses = results;
 
 }
 
@@ -55,14 +48,6 @@ function draw() {
   //       parameters (the size?) of text that is displayed on the screen, like
   //       in the Google and Bill T. Jones collaboration here:
   //       https://experiments.withgoogle.com/billtjonesai
-
-  drawPose(); // We call our function to draw the keypoints
-}
-
-// Dan Shiffman's function drawing various kinds of dots in various keypoints
-function drawPose() {
-
-  if (!poses) return; // only execute if we have poses detected
 
   // Draw the skeleton connections
   for (let i = 0; i < poses.length; i++) {
@@ -107,8 +92,20 @@ function drawPose() {
   // IDEA: going further with this, you have no obligation to work with the entire
   //       skeleton, and perhaps you might want to use only the two wrists, or the
   //       two knees, or less obvious combinations (eye and hip?, wrist and knee?)
+}
+
+// Dan Shiffman's function drawing various kinds of dots in various keypoints
+function drawPose() {
 
 }
+
+
+// Callback function for when bodyPose outputs data
+function gotPoses(results) {
+  // `results` is an array (the model can detect more than one person!)
+  poses = results;
+}
+
 
 // A click of the mouse logs the pose & connections!
 function mousePressed() {
