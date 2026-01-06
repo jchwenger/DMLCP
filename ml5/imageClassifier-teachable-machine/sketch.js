@@ -24,18 +24,17 @@ let video;
 let label = "";
 let confidence = 0.0;
 
-// Load the model first
-function preload() {
-  classifier = ml5.imageClassifier(imageModelURL + 'model.json');
+
+async function setup() {
+  // Fun fact: change the string to "MobileNet" and you now have regular image classification!
+  classifier = await ml5.imageClassifier(imageModelURL + 'model.json');
 
   // IDEA: try instantiate *two* models, instead of one? You could train a model associating                                                                    
   // postures with poetic snippets (the class names), and display them on the screen? Note that
   // you would need to change the classifyVideo function, which currently uses the classifier
   // global variable by default.                                                                                                                                
-                                                                  
-}
 
-function setup() {
+
   createCanvas(320, 260);
 
   // Create the video

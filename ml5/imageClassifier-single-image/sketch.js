@@ -10,18 +10,16 @@ let classifier,
     result_string = "Predicting...",
     img;
 
-// Instantiate our model and load our image *before* setup
-// (this is the role of `preload`, to be run before `setup`)
-function preload() {
+async function setup() {
 
-  classifier = ml5.imageClassifier("MobileNet"); // also: DarkNet , DarkNet-Tiny, DoodleNet
+  classifier = await ml5.imageClassifier("MobileNet"); // also: DarkNet , DarkNet-Tiny, DoodleNet
 
   // load in our classifier from the internet, downloading the model if need be
   // (by default the model returns the top 3 predictions, for more pass the option
   // {topk: 5}, or any number up to 1000, as a second argument!)
   // See: https://docs.ml5js.org/#/reference/image-classifier?id=ml5imageclassifier
 
-  img = loadImage("images/labrador.jpg");
+  img = await loadImage("images/labrador.jpg");
 
   // load our dog image; try the australian-labradoodle-guide.jpg, does it work well?
   // IDEA: import, or even create, your own images, see what the model is able to recognise
@@ -30,9 +28,7 @@ function preload() {
   //       and allowing the user to switch between images. Or even use an API to pull images
   //       from the Internet?
 
-}
 
-function setup() {
   createCanvas(img.width, img.height + 50);
 
   // IDEA: here, instead of using an existing image, you could *create one*
@@ -48,6 +44,8 @@ function setup() {
   //       can be passed to the network). The interesting thing is that this
   //       would allow people to see how the new patterns gradually degrade the
   //       network's performance!
+
+
 
                         // ↓ the callback, see below
   classifier.classify(img, gotResults);
