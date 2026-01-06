@@ -5,9 +5,8 @@
   originally from https://github.com/ml5js/Intro-ML-Arts-IMA-F21
   More rececent course: https://github.com/ml5js/Intro-ML-Arts-IMA-F24
 
-  Reference (deprecated): https://archive-docs.ml5js.org/#/reference/sound-classifier
-  Updated to this (works like imageClassifier): https://docs.ml5js.org/#/reference/image-classifier
-  See also this: https://docs.ml5js.org/#/reference/sound-classifier
+  Documentation: https://docs.ml5js.org/#/reference/sound-classifier
+  Source: https://github.com/ml5js/ml5-next-gen/tree/main/examples/soundClassifier-teachable-machine-p5-2.0
 
   Note: when I tested it, the Teachable Machines interface didn't
   work so well with Firefox (OK with Chrome).
@@ -15,7 +14,7 @@
 
 let classifier,
     hasLogged = false, // log only once
-    label = "listening";
+    predictedSound = "";
 
 let results;
 
@@ -25,12 +24,7 @@ let results;
 //       default state the sketch returns to?
 
 // Teachable Machine model URL:
-const soundModelURL = 'https://teachablemachine.withgoogle.com/models/h3p9R41J/'; // hand clap
-const instructions = 'Clap your hands!';
-
-// Other model
-// const soundModelURL = 'https://teachablemachine.withgoogle.com/models/ueOfZRiLS/'; // 'blah', 'ouh', 'OK'
-// const instructions = 'Say "blah", "ouh", or "OK"';
+const soundModelURL = "https://teachablemachine.withgoogle.com/models/FvsFiSwHW/"; // hand clap & whistle
 
 // IDEA: this would allow you to learn commands that activate certain actions or effects in
 //       the sketch, for instance, the creation of certain shapes?
@@ -39,39 +33,47 @@ const instructions = 'Clap your hands!';
 //       on? (You might hit a wall there, especially if you don't have a lot of training data,
 //       but it would be quite interesting to try it out!)
 
-function preload() {
-  // Load the model
-  classifier = ml5.soundClassifier(soundModelURL + 'model.json');
-}
 
-function setup() {
-  createCanvas(320, 240);
-  createP(instructions);
+async function setup() {
+
+  // Load the model
+  classifier = await ml5.soundClassifier(soundModelURL);
+
+  createCanvas(650, 450);
+  textAlign(CENTER, CENTER);
+  textSize(32);
+
   // Start classifying
   // The sound model will continuously listen to the microphone
   classifier.classifyStart(gotResult);
 }
 
 function draw() {
-  background(0);
-  // Draw the label in the canvas
-  fill(255);
-  textSize(32);
-  textAlign(CENTER, CENTER);
-  text(label, width / 2, height / 2);
+  background(250);
+
+  // Update canvas according to classification results
+  if (predictedSound == "Background Noise" || predictedSound == "") {
+    fill(0);
+    textSize(64);
+    text("clap 👏 or whistle 🎵 ", width / 2, height / 2);
+  } else if (predictedSound == "Clap") {
+    background(231, 176, 255);
+    textSize(128);
+    text("👏", width / 2, height / 2);
+  } else if (predictedSound == "whistle") {
+    background(255, 242, 143);
+    textSize(128);
+    text("🎵", width / 2, height / 2);
+  }
+
 }
 
 
 // The model recognizing a sound will trigger this event
 function gotResult(results) {
-
-  if (!results) return; // avoid error before any detection is made
-
   // The results are in an array ordered by confidence.
-  if (!hasLogged) {
-    console.log(results);
-    hasLogged = true;
-  }
-  label = results[0].label;
+  console.log(results);
+  // Store the first label
+  predictedSound = results[0].label;
 
 }
