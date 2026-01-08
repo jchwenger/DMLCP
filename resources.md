@@ -1,4 +1,3 @@
-# S71074B: Data and Machine Learning for Artistic Practice  
 # Resources
 
 Setup instructions are in [setup page](setup.md), and have a look at the [technical resource page](technical-resources.md) as well.
@@ -109,7 +108,7 @@ Setup instructions are in [setup page](setup.md), and have a look at the [techni
  
 ## Ethics, art, and more
 
-- Memo Atken, [A journey through multiple dimensions and transformations in SPACE](https://medium.com/artists-and-machine-intelligence/a-journey-through-multiple-dimensions-and-transformations-in-space-the-final-frontier-d8435d81ca51)
+- Memo Akten, [A journey through multiple dimensions and transformations in SPACE](https://medium.com/artists-and-machine-intelligence/a-journey-through-multiple-dimensions-and-transformations-in-space-the-final-frontier-d8435d81ca51)
 - Rodney Brooks, [The seven deadly sins of AI predictions](https://www.technologyreview.com/2017/10/06/241837/the-seven-deadly-sins-of-ai-predictions/)
 - Kate Crawford and Trevor Paglen, [Excavating AI: The Politics of Images in Machine Learning Training Sets](https://excavating.ai/)
 - Aaron Hertzmann, [Why computers do not make art](https://medium.com/@aaronhertzmann/why-computers-do-not-make-art-6c7f9bff6b04) (and his [blog](https://aaronhertzmann.com))
