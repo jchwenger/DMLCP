@@ -94,11 +94,6 @@ function draw() {
   //       two knees, or less obvious combinations (eye and hip?, wrist and knee?)
 }
 
-// Dan Shiffman's function drawing various kinds of dots in various keypoints
-function drawPose() {
-
-}
-
 
 // Callback function for when bodyPose outputs data
 function gotPoses(results) {
