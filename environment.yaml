@@ -17,8 +17,12 @@ dependencies:
   - markdown
   - ruff
   - scikit-image
+  - scikit-learn
   - gdown
   - gradio
+  - transformers
+  - diffusers
+  - accelerate
   - pip:
     - strip-markdown
     - py5canvas
