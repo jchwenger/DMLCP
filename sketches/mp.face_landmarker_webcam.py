@@ -46,7 +46,9 @@ from utils import FACEMESH_RIGHT_EYEBROW
 # --------------------------------------------------------------------------------
 
 WINDOW_NAME = "Face Detection"
-VIDEO_SIZE = 512
+
+VIDEO_WIDTH = 512
+VIDEO_HEIGHT = 512
 
 
 # Function to draw landmarks on the image
@@ -181,7 +183,7 @@ while cap.isOpened():
     frame = cv2.flip(frame, 1)
 
     # Resize the frame to the desired dimensions
-    resized_frame = cv2.resize(frame, (VIDEO_SIZE, VIDEO_SIZE))
+    resized_frame = cv2.resize(frame, (VIDEO_WIDTH, VIDEO_HEIGHT))
 
     # Convert the frame to RGB and create MediaPipe Image
     rgb_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2RGB)

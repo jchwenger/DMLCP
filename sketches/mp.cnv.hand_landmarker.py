@@ -27,6 +27,12 @@ from py5canvas import *
 
 # --------------------------------------------------------------------------------
 
+
+VIDEO_WIDTH = 512
+VIDEO_HEIGHT = 512
+
+DRAW_SUBSETS = False
+
 # Path to the model file
 model_path = pathlib.Path("models/hand_landmarker.task")
 # see models here: https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker#models
@@ -40,14 +46,11 @@ model = vision.HandLandmarker.create_from_options(options)
 
 # --------------------------------------------------------------------------------
 
-VIDEO_SIZE = 512
-video = VideoInput(size=(VIDEO_SIZE, VIDEO_SIZE), flipped=True)
-
-DRAW_SUBSETS = False
+video = VideoInput(size=(VIDEO_WIDTH, VIDEO_HEIGHT), flipped=True)
 
 
 def setup():
-    create_canvas(VIDEO_SIZE, VIDEO_SIZE)
+    create_canvas(VIDEO_WIDTH, VIDEO_HEIGHT)
 
 
 def draw():
@@ -58,7 +61,6 @@ def draw():
     frame = np.array(frame)  # uint8 (SRGB)
 
     push()
-    scale(width / VIDEO_SIZE)
     image(frame)
 
     # Detect hand landmarks
@@ -67,7 +69,6 @@ def draw():
 
     # Draw each detected hand
     if result and result.hand_landmarks:
-
         for i, lms in enumerate(result.hand_landmarks):
             pts = landmarks_to_px(lms)
 
@@ -95,7 +96,9 @@ def key_pressed(key, mods=None):
 
 def landmarks_to_px(lms):
     """Convert one hand's landmarks to pixel coordinates in the video space."""
-    return np.array([[lm.x * VIDEO_SIZE, lm.y * VIDEO_SIZE] for lm in lms], dtype=float)
+    return np.array(
+        [[lm.x * VIDEO_HEIGHT, lm.y * VIDEO_WIDTH] for lm in lms], dtype=float
+    )
 
 
 def draw_hand(pts, subsets=False):
@@ -140,7 +143,7 @@ def handedness_label(result, hand_index):
     try:
         hd = result.handedness[hand_index]
         if hd:
-            # correct for flipping of camera
+            # correct for flipping of camera
             return "Right" if hd[0].category_name == "Left" else "Left"
     except Exception as e:
         print(f"Error occurred retrieving handedness: {e}")

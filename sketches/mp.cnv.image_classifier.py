@@ -19,9 +19,13 @@ from py5canvas import *
 
 # --------------------------------------------------------------------------------
 
+
+VIDEO_WIDTH = 512
+VIDEO_HEIGHT = 512
+
 # Path to the model file
 model_path = pathlib.Path("models/efficientnet_lite0.tflite")
-# also available as /int8/ instead of /float32/, see here: https://ai.google.dev/edge/mediapipe/solutions/vision/image_classifier/index#efficientnet-lite0_model_recommended
+# also available as /int8/ instead of /float32/, see here: https://ai.google.dev/edge/mediapipe/solutions/vision/image_classifier/index#efficientnet-lite0_model_recommended
 url = "https://storage.googleapis.com/mediapipe-models/image_classifier/efficientnet_lite0/float32/latest/efficientnet_lite0.tflite"
 model_path = ensure_model(model_path, url)
 
@@ -32,12 +36,11 @@ classifier = vision.ImageClassifier.create_from_options(options)
 
 # --------------------------------------------------------------------------------
 
-VIDEO_SIZE = 512
-video = VideoInput(size=(VIDEO_SIZE, VIDEO_SIZE))
+video = VideoInput(size=(VIDEO_WIDTH, VIDEO_HEIGHT))
 
 
 def setup():
-    create_canvas(VIDEO_SIZE, VIDEO_SIZE)
+    create_canvas(VIDEO_WIDTH, VIDEO_HEIGHT)
     text_size(14)
 
 
@@ -52,7 +55,6 @@ def draw():
     classification_result = classifier.classify(mp_image)
 
     push()
-    scale(width / VIDEO_SIZE)
     image(frame)
 
     # Draw classification label (top result)
@@ -76,12 +78,12 @@ def draw_label(anchor_xy, text_str):
     rect_mode(CORNER)
     no_stroke()
     fill(0, 0, 0, 190)
-    rectangle((x - txt_pad_x, y - th - txt_pad_y), (tw + 2 * txt_pad_x, th + 2 * txt_pad_y))
+    rectangle(
+        (x - txt_pad_x, y - th - txt_pad_y), (tw + 2 * txt_pad_x, th + 2 * txt_pad_y)
+    )
 
     fill(0, 255, 0)
     text(text_str, (x, y))
 
 
 run()
-
-

@@ -9,6 +9,7 @@
 # --------------------------------------------------------------------------------
 
 import pathlib
+import numpy as np
 
 import mediapipe as mp
 from mediapipe.tasks.python import vision
@@ -18,7 +19,13 @@ from utils import ensure_model
 
 from utils import POSE_CONNECTIONS
 
+from py5canvas import *
+
 # --------------------------------------------------------------------------------
+
+
+VIDEO_WIDTH = 512
+VIDEO_HEIGHT = 512
 
 # Path to the model file
 model_path = pathlib.Path("models/pose_landmarker_lite.task")
@@ -35,15 +42,11 @@ model = vision.PoseLandmarker.create_from_options(options)
 
 # --------------------------------------------------------------------------------
 
-from py5canvas import *
-import numpy as np
-
-VIDEO_SIZE = 512
-video = VideoInput(size=(VIDEO_SIZE, VIDEO_SIZE))
+video = VideoInput(1, size=(VIDEO_WIDTH, VIDEO_HEIGHT))
 
 
 def setup():
-    create_canvas(VIDEO_SIZE, VIDEO_SIZE)
+    create_canvas(VIDEO_WIDTH, VIDEO_HEIGHT)
 
 
 def draw():
@@ -54,7 +57,6 @@ def draw():
     frame = np.array(frame)  # uint8 (SRGB)
 
     push()
-    scale(width / VIDEO_SIZE)
     image(frame)
 
     # Detect pose landmarks
@@ -63,7 +65,6 @@ def draw():
 
     # Draw each detected person
     if result and result.pose_landmarks:
-
         for lms in result.pose_landmarks:
             pts = landmarks_to_px(lms)
 
@@ -87,7 +88,9 @@ def draw():
 
 def landmarks_to_px(lms):
     """Convert one pose's landmarks to pixel coordinates in the video space."""
-    return np.array([[lm.x * VIDEO_SIZE, lm.y * VIDEO_SIZE] for lm in lms], dtype=float)
+    return np.array(
+        [[lm.x * VIDEO_WIDTH, lm.y * VIDEO_HEIGHT] for lm in lms], dtype=float
+    )
 
 
 def draw_connections(pts, connections):

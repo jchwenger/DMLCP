@@ -24,7 +24,9 @@ from utils import ensure_model
 # --------------------------------------------------------------------------------
 
 WINDOW_NAME = "Object Detection"
-VIDEO_SIZE = 512
+
+VIDEO_WIDTH = 512
+VIDEO_HEIGHT = 512
 
 SHOW_FPS = False
 FPS_AVG_FRAME_COUNT = 10
@@ -37,7 +39,7 @@ RECT_COLOR = (255, 0, 0)  # blue (BGR)
 TEXT_COLOR = (255, 255, 255)  # white
 
 model_path = pathlib.Path("models/efficientdet_lite0.tflite")
-# see other models here: https://ai.google.dev/edge/mediapipe/solutions/vision/object_detector
+# see other models here: https://ai.google.dev/edge/mediapipe/solutions/vision/object_detector
 url = "https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/int8/latest/efficientdet_lite0.tflite"
 model_path = ensure_model(model_path, url)
 
@@ -124,7 +126,7 @@ while cap.isOpened():
     frame = cv2.flip(frame, 1)
 
     # Resize the frame to the desired dimensions
-    resized_frame = cv2.resize(frame, (VIDEO_SIZE, VIDEO_SIZE))
+    resized_frame = cv2.resize(frame, (VIDEO_WIDTH, VIDEO_HEIGHT))
 
     # Convert frame to RGB format (as expected by MediaPipe)
     rgb_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2RGB)

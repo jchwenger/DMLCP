@@ -36,6 +36,10 @@ from py5canvas import *
 
 # --------------------------------------------------------------------------------
 
+
+VIDEO_WIDTH = 512
+VIDEO_HEIGHT = 512
+
 # Path to the model file
 model_path = pathlib.Path("models/face_landmarker.task")
 # see other models here: https://ai.google.dev/edge/mediapipe/solutions/vision/face_landmarker#models
@@ -54,12 +58,11 @@ model = vision.FaceLandmarker.create_from_options(options)
 
 # --------------------------------------------------------------------------------
 
-VIDEO_SIZE = 512
-video = VideoInput(size=(VIDEO_SIZE, VIDEO_SIZE))
+video = VideoInput(size=(VIDEO_WIDTH, VIDEO_HEIGHT))
 
 
 def setup():
-    create_canvas(VIDEO_SIZE, VIDEO_SIZE)
+    create_canvas(VIDEO_WIDTH, VIDEO_HEIGHT)
 
 
 def draw():
@@ -71,7 +74,6 @@ def draw():
     frame = np.array(frame)
 
     push()
-    scale(width / VIDEO_SIZE)
     image(frame)
 
     # Convert the frame to RGB and create MediaPipe Image
@@ -133,7 +135,7 @@ def draw():
 
 # convert one face's landmarks to pixel coordinates
 def landmarks_to_px(lms):
-    return np.array([[lm.x * VIDEO_SIZE, lm.y * VIDEO_SIZE] for lm in lms], dtype=float)
+    return np.array([[lm.x * VIDEO_WIDTH, lm.y * VIDEO_HEIGHT] for lm in lms], dtype=float)
 
 
 # Helper: draw a set of connections

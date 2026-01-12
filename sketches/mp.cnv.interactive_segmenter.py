@@ -24,6 +24,10 @@ from py5canvas import *
 
 # --------------------------------------------------------------------------------
 
+
+VIDEO_WIDTH = 800
+VIDEO_HEIGHT = 600
+
 # Variables to control transparency
 # 0: no mask, 1: mask only, 2: mask with transparency
 FOREGROUND_DISPLAY_MODE = 0
@@ -55,12 +59,11 @@ segmenter = vision.InteractiveSegmenter.create_from_options(options)
 
 # --------------------------------------------------------------------------------
 
-VIDEO_SIZE = 512
-video = VideoInput(size=(VIDEO_SIZE, VIDEO_SIZE))
+video = VideoInput(size=(VIDEO_WIDTH, VIDEO_HEIGHT))
 
 
 def setup():
-    create_canvas(VIDEO_SIZE, VIDEO_SIZE)
+    create_canvas(VIDEO_WIDTH, VIDEO_HEIGHT)
     text_size(12)
 
 
@@ -99,25 +102,24 @@ def draw():
     if FOREGROUND_DISPLAY_MODE == 1:  # Only mask (fully opaque)
         output_image = np.where(condition, fg_overlay, output_image)
     elif FOREGROUND_DISPLAY_MODE == 2:  # Mask with transparency
-        blended_fg = ((0.5 * fg_overlay + 0.5 * frame)).astype(np.uint8)
+        blended_fg = (0.5 * fg_overlay + 0.5 * frame).astype(np.uint8)
         output_image = np.where(condition, blended_fg, output_image)
 
     # Apply the background mask based on the selected display mode
     if BACKGROUND_DISPLAY_MODE == 1:  # Only mask (fully opaque)
         output_image = np.where(~condition, bg_overlay, output_image)
     elif BACKGROUND_DISPLAY_MODE == 2:  # Mask with transparency
-        blended_bg = ((0.5 * bg_overlay + 0.5 * frame)).astype(np.uint8)
+        blended_bg = (0.5 * bg_overlay + 0.5 * frame).astype(np.uint8)
         output_image = np.where(~condition, blended_bg, output_image)
 
     # Draw to the canvas
     push()
-    scale(width / VIDEO_SIZE)
     image(output_image)
 
     # Selection point indicator
     keypoint_px = (
-        int(KEYPOINT_X * VIDEO_SIZE),
-        int(KEYPOINT_Y * VIDEO_SIZE),
+        int(KEYPOINT_X * VIDEO_WIDTH),
+        int(KEYPOINT_Y * VIDEO_HEIGHT),
     )
     stroke(0)
     stroke_weight(3)
@@ -179,7 +181,9 @@ def draw_label(anchor_xy, text_str):
     rect_mode(CORNER)
     no_stroke()
     fill(0, 0, 0, 190)
-    rectangle((x - txt_pad_x, y - th - txt_pad_y), (tw + 2 * txt_pad_x, th + 2 * txt_pad_y))
+    rectangle(
+        (x - txt_pad_x, y - th - txt_pad_y), (tw + 2 * txt_pad_x, th + 2 * txt_pad_y)
+    )
 
     fill(255)
     text(text_str, (x, y))

@@ -27,6 +27,12 @@ from utils import _normalized_to_pixel_coordinates
 
 # --------------------------------------------------------------------------------
 
+# Display configuration
+WINDOW_NAME = "Interactive Segmentation"
+
+VIDEO_WIDTH = 512
+VIDEO_HEIGHT = 512
+
 # Variables to control transparency
 # 0: no mask, 1: mask only, 2: mask with transparency
 FOREGROUND_DISPLAY_MODE = 0
@@ -41,10 +47,6 @@ FG_COLOR = (0, 255, 255)  # cyan
 
 RegionOfInterest = vision.InteractiveSegmenterRegionOfInterest
 NormalizedKeypoint = containers.keypoint.NormalizedKeypoint
-
-# Display configuration
-WINDOW_NAME = "Interactive Segmentation"
-VIDEO_SIZE = 512
 
 
 # Callback function to select point on mouse click
@@ -71,7 +73,7 @@ segmenter = vision.InteractiveSegmenter.create_from_options(options)
 # --------------------------------------------------------------------------------
 
 # Open webcam video stream
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
 cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_GUI_NORMAL)
 cv2.setWindowProperty(WINDOW_NAME, cv2.WND_PROP_AUTOSIZE, cv2.WINDOW_AUTOSIZE)
@@ -85,7 +87,7 @@ while cap.isOpened():
     # Flip frame horizontally (like a mirror)
     frame = cv2.flip(frame, 1)
 
-    resized_frame = cv2.resize(frame, (VIDEO_SIZE, VIDEO_SIZE))
+    resized_frame = cv2.resize(frame, (VIDEO_WIDTH, VIDEO_HEIGHT))
     h, w = resized_frame.shape[:2]
 
     # Convert frame to RGB

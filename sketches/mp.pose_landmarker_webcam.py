@@ -31,12 +31,14 @@ from utils import POSE_CONNECTIONS
 
 # --------------------------------------------------------------------------------
 
+WINDOW_NAME = "Pose Detection"
+
+VIDEO_WIDTH = 512
+VIDEO_HEIGHT = 512
+
 # Segmentation mask display modes
 # 0: No mask, 1: Transparent overlay, 2: Only mask
 SEGMENTATION_MODE = 0
-
-WINDOW_NAME = "Pose Detection"
-WINDOW_SIZE = 512
 
 GREEN_COLOR = (0, 128, 0)
 BLUE_COLOR = (255, 0, 0)
@@ -99,7 +101,7 @@ while cap.isOpened():
     frame = cv2.flip(frame, 1)
 
     # Resize the frame to the desired dimensions
-    resized_frame = cv2.resize(frame, (VIDEO_SIZE, VIDEO_SIZE))
+    resized_frame = cv2.resize(frame, (VIDEO_WIDTH, VIDEO_HEIGHT))
 
     # Convert frame to RGB format (as expected by MediaPipe)
     rgb_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2RGB)

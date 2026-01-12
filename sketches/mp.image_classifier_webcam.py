@@ -23,11 +23,13 @@ from utils import ensure_model
 # --------------------------------------------------------------------------------
 
 WINDOW_NAME = "Image Classification"
-VIDEO_SIZE = 512
+
+VIDEO_WIDTH = 512
+VIDEO_HEIGHT = 512
 
 # Path to the model file
 model_path = pathlib.Path("models/efficientnet_lite0.tflite")
-# also available as /int8/ instead of /float32/, see here: https://ai.google.dev/edge/mediapipe/solutions/vision/image_classifier/index#efficientnet-lite0_model_recommended
+# also available as /int8/ instead of /float32/, see here: https://ai.google.dev/edge/mediapipe/solutions/vision/image_classifier/index#efficientnet-lite0_model_recommended
 url = "https://storage.googleapis.com/mediapipe-models/image_classifier/efficientnet_lite0/float32/latest/efficientnet_lite0.tflite"
 model_path = ensure_model(model_path, url)
 
@@ -55,7 +57,7 @@ while cap.isOpened():
     frame = cv2.flip(frame, 1)
 
     # Resize the frame to the desired dimensions
-    resized_frame = cv2.resize(frame, (VIDEO_SIZE, VIDEO_SIZE))
+    resized_frame = cv2.resize(frame, (VIDEO_WIDTH, VIDEO_HEIGHT))
 
     # Convert the frame to RGB format (as expected by MediaPipe)
     rgb_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2RGB)

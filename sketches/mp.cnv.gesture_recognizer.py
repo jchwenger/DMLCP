@@ -26,6 +26,12 @@ from py5canvas import *
 
 # --------------------------------------------------------------------------------
 
+
+VIDEO_WIDTH = 512
+VIDEO_HEIGHT = 512
+
+DRAW_SUBSETS = False
+
 # Path to the model file
 model_path = pathlib.Path("models/gesture_recognizer.task")
 # see models here: https://ai.google.dev/edge/mediapipe/solutions/vision/gesture_recognizer#models
@@ -57,14 +63,12 @@ print(
 )
 print("----------------------------------------")
 
-VIDEO_SIZE = 512
-video = VideoInput(size=(VIDEO_SIZE, VIDEO_SIZE), flipped=True)
 
-DRAW_SUBSETS = False
+video = VideoInput(size=(VIDEO_WIDTH, VIDEO_HEIGHT), flipped=True)
 
 
 def setup():
-    create_canvas(VIDEO_SIZE, VIDEO_SIZE)
+    create_canvas(VIDEO_WIDTH, VIDEO_HEIGHT)
     text_size(12)
 
 
@@ -79,7 +83,7 @@ def draw():
     result = recognizer.recognize(mp_image)
 
     push()
-    scale(width / VIDEO_SIZE)
+
     image(frame)
 
     if result and getattr(result, "hand_landmarks", None):
@@ -121,7 +125,9 @@ def key_pressed(key, mods=None):
 
 def landmarks_to_px(lms):
     """Convert one hand's landmarks to pixel coordinates in the video space."""
-    return np.array([[lm.x * VIDEO_SIZE, lm.y * VIDEO_SIZE] for lm in lms], dtype=float)
+    return np.array(
+        [[lm.x * VIDEO_WIDTH, lm.y * VIDEO_HEIGHT] for lm in lms], dtype=float
+    )
 
 
 def draw_hand(pts, subsets=False):
@@ -163,7 +169,7 @@ def handedness_label(handedness_list, idx):
     try:
         hd = handedness_list[idx]
         if hd:
-            # correct for flipping of camera
+            # correct for flipping of camera
             return "Right" if hd[0].category_name == "Left" else "Left"
     except Exception as e:
         print(f"Error occurred retrieving handedness: {e}")

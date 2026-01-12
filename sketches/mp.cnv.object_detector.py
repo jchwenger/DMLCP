@@ -19,6 +19,9 @@ from py5canvas import *
 
 # --------------------------------------------------------------------------------
 
+VIDEO_WIDTH = 512
+VIDEO_HEIGHT = 512
+
 WINDOW_MARGIN = 24
 LABEL_ROW_SIZE = 24
 
@@ -30,7 +33,7 @@ FPS_AVG_FRAME_COUNT = 10
 
 # Path to the model file
 model_path = pathlib.Path("models/efficientdet_lite0.tflite")
-# see other models here: https://ai.google.dev/edge/mediapipe/solutions/vision/object_detector
+# see other models here: https://ai.google.dev/edge/mediapipe/solutions/vision/object_detector
 url = "https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/int8/latest/efficientdet_lite0.tflite"
 model_path = ensure_model(model_path, url)
 
@@ -44,15 +47,14 @@ detector = vision.ObjectDetector.create_from_options(options)
 
 # --------------------------------------------------------------------------------
 
-VIDEO_SIZE = 512
-video = VideoInput(size=(VIDEO_SIZE, VIDEO_SIZE))
+video = VideoInput(size=(VIDEO_WIDTH, VIDEO_HEIGHT))
 
 counter, fps = 0, 0.0
 start_time = time.time()
 
 
 def setup():
-    create_canvas(VIDEO_SIZE, VIDEO_SIZE)
+    create_canvas(VIDEO_WIDTH, VIDEO_HEIGHT)
     text_size(12)
 
 
@@ -71,7 +73,6 @@ def draw():
     detection_result = detector.detect(mp_image)
 
     push()
-    scale(width / VIDEO_SIZE)
     image(frame)
 
     if detection_result and detection_result.detections:
