@@ -47,47 +47,7 @@ result_lock = threading.Lock()
 audio_timestamp_ms = 0  # Timestamp for audio stream
 last_request_time = {}  # Track request times by timestamp
 
-
-def get_category_color(category_index, total_classes):
-    """
-    Get a consistent color for a category based on its index.
-    Uses a 3D distribution in HSV color space to maximize color separation.
-    Distributes colors across hue, saturation, and value dimensions using
-    a method that ensures all three components vary independently.
-    Returns RGB tuple (0-255 range) using py5canvas's hsv_to_rgb function.
-    """
-    # Use a 3D distribution that cycles through all dimensions
-    # For 521 classes, we'll distribute across:
-    # - Hue: primary dimension (most variation) - full 0-1 range
-    # - Saturation: secondary dimension - 0.5-1.0 range (avoid too desaturated)
-    # - Value: tertiary dimension - 0.6-1.0 range (avoid too dark)
-
-    # Calculate how many steps we need for each dimension
-    # We want roughly equal distribution, so we'll use the cube root
-    # For 521: cube root ≈ 8.04, so we'll use 8 steps per dimension = 512 combinations
-    steps = int(np.ceil(total_classes ** (1.0 / 3.0)))
-
-    # Map index to 3D coordinates using modulo arithmetic
-    # This ensures we cycle through all combinations
-    h_step = category_index % steps
-    s_step = (category_index // steps) % steps
-    v_step = (category_index // (steps * steps)) % steps
-
-    # Convert steps to normalized HSV values (0-1)
-    # Hue: full range for maximum color variety
-    hue_normalized = h_step / steps
-
-    # Saturation: range 0.5-1.0 to keep colors vibrant
-    saturation = 0.5 + (s_step / steps) * 0.5
-
-    # Value: range 0.6-1.0 to keep colors bright enough
-    value = 0.6 + (v_step / steps) * 0.4
-
-    # Use py5canvas's hsv_to_rgb function directly to convert HSV to RGB
-    # hsv_to_rgb expects normalized HSV values (0-1) and returns normalized RGB (0-1)
-    rgb_normalized = hsv_to_rgb(np.array([hue_normalized, saturation, value]))
-    # Convert to 0-255 range and return as tuple of integers
-    return tuple(int(c * 255) for c in rgb_normalized[:3])
+# --------------------------------------------------------------------------------
 
 
 # Callback for classification results
@@ -105,8 +65,6 @@ def result_callback(result, timestamp_ms):
                 del last_request_time[oldest_key]
 
 
-# --------------------------------------------------------------------------------
-
 # Path to the model file
 model_path = pathlib.Path("models/yamnet.tflite")
 # see models here: https://ai.google.dev/edge/mediapipe/solutions/audio/audio_classifier#models
@@ -117,7 +75,8 @@ model_path = ensure_model(model_path, url)
 base_options = base_options_module.BaseOptions(model_asset_path=str(model_path))
 options = audio.AudioClassifierOptions(
     base_options=base_options,
-    max_results=-1,
+    # -1 for all the results
+    max_results=10,
     running_mode=audio_task_running_mode.AudioTaskRunningMode.AUDIO_STREAM,
     result_callback=result_callback,
 )
@@ -179,6 +138,78 @@ def draw():
 
     # Draw waveform visualization
     draw_waveform()
+
+
+def key_pressed(key):
+    if key == " ":
+        print("-" * 80)
+        if len(latest_result.classifications) > 0:
+            sorted_categories = sorted(
+                latest_result.classifications[0].categories, key=lambda c: c.score
+            )
+            for c in sorted_categories:
+                print(c)
+        print("-" * 80)
+
+
+def mouse_pressed():
+    global latest_result
+
+    print()
+    # print(latest_result)
+    # print()
+
+    for c in latest_result.classifications:
+        # print(c)
+        for cc in c.categories:
+            # print(cc)
+            print(cc.category_name, "| score:", cc.score)
+
+
+# --------------------------------------------------------------------------------
+# Helpers
+
+
+def get_category_color(category_index, total_classes):
+    """
+    Get a consistent color for a category based on its index.
+    Uses a 3D distribution in HSV color space to maximize color separation.
+    Distributes colors across hue, saturation, and value dimensions using
+    a method that ensures all three components vary independently.
+    Returns RGB tuple (0-255 range) using py5canvas's hsv_to_rgb function.
+    """
+    # Use a 3D distribution that cycles through all dimensions
+    # For 521 classes, we'll distribute across:
+    # - Hue: primary dimension (most variation) - full 0-1 range
+    # - Saturation: secondary dimension - 0.5-1.0 range (avoid too desaturated)
+    # - Value: tertiary dimension - 0.6-1.0 range (avoid too dark)
+
+    # Calculate how many steps we need for each dimension
+    # We want roughly equal distribution, so we'll use the cube root
+    # For 521: cube root ≈ 8.04, so we'll use 8 steps per dimension = 512 combinations
+    steps = int(np.ceil(total_classes ** (1.0 / 3.0)))
+
+    # Map index to 3D coordinates using modulo arithmetic
+    # This ensures we cycle through all combinations
+    h_step = category_index % steps
+    s_step = (category_index // steps) % steps
+    v_step = (category_index // (steps * steps)) % steps
+
+    # Convert steps to normalized HSV values (0-1)
+    # Hue: full range for maximum color variety
+    hue_normalized = h_step / steps
+
+    # Saturation: range 0.5-1.0 to keep colors vibrant
+    saturation = 0.5 + (s_step / steps) * 0.5
+
+    # Value: range 0.6-1.0 to keep colors bright enough
+    value = 0.6 + (v_step / steps) * 0.4
+
+    # Use py5canvas's hsv_to_rgb function directly to convert HSV to RGB
+    # hsv_to_rgb expects normalized HSV values (0-1) and returns normalized RGB (0-1)
+    rgb_normalized = hsv_to_rgb(np.array([hue_normalized, saturation, value]))
+    # Convert to 0-255 range and return as tuple of integers
+    return tuple(int(c * 255) for c in rgb_normalized[:3])
 
 
 def draw_waveform():
@@ -298,18 +329,6 @@ def draw_classification_results():
             y_offset += bar_spacing
 
     pop()
-
-
-def key_pressed(key):
-    if key == " ":
-        print("-" * 80)
-        if len(latest_result.classifications) > 0:
-            sorted_categories = sorted(
-                latest_result.classifications[0].categories, key=lambda c: c.score
-            )
-            for c in sorted_categories:
-                print(c)
-        print("-" * 80)
 
 
 run()
