@@ -92,13 +92,13 @@ def draw():
 
             no_fill()
 
-            # 1) Light tessellation (cyan)
-            stroke(0, 255, 255)
-            stroke_weight(0.2)
+            # 1) Light tessellation
+            stroke(0, 255, 255, 100)  # cyan
+            stroke_weight(0.4)
             draw_connections(pts, FACEMESH_TESSELATION)
 
             # 2) Accented contours (thicker) — different colors for readability
-            stroke_weight(0.8)
+            stroke_weight(2)
 
             # Eyebrows
             stroke(255, 105, 180)  # pink
@@ -112,20 +112,20 @@ def draw():
 
             stroke(147, 112, 219)  # blue-purple
             draw_connections(pts, FACEMESH_RIGHT_EYE)
-            if FACEMESH_IRISES:
-                stroke(70, 130, 180)
-                draw_connections(pts, FACEMESH_IRISES)
+
+            stroke(255, 255, 0)  # yellow
+            draw_connections(pts, FACEMESH_IRISES)
 
             # Lips
-            stroke(0, 255, 255)  # cyan
+            stroke(255, 0, 0)  # red
             draw_connections(pts, FACEMESH_LIPS)
 
-            # Face oval
-            stroke(64, 224, 208)  # teal
+            # Face oval (white)
+            stroke(255)
             draw_connections(pts, FACEMESH_FACE_OVAL)
 
-            # Face contours (eyes, eyebrows, mouth, around face)
-            # stroke(255, 0, 0)
+            # # Face contours (eyes, eyebrows, mouth, around face)
+            # stroke(0, 255, 0)
             # draw_connections(pts, FACEMESH_CONTOURS)
 
     pop()
