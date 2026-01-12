@@ -22,10 +22,6 @@ from utils import ensure_model
 from utils import DrawingSpec
 from utils import draw_landmarks
 
-from utils import get_default_face_mesh_contours_style
-from utils import get_default_face_mesh_tesselation_style
-from utils import get_default_face_mesh_iris_connections_style
-
 from utils import FACEMESH_LIPS
 from utils import FACEMESH_NOSE
 
@@ -47,8 +43,8 @@ from utils import FACEMESH_RIGHT_EYEBROW
 
 WINDOW_NAME = "Face Detection"
 
-VIDEO_WIDTH = 512
-VIDEO_HEIGHT = 512
+VIDEO_WIDTH = 800
+VIDEO_HEIGHT = 600
 
 
 # Function to draw landmarks on the image
@@ -64,21 +60,27 @@ def draw_landmarks_on_image(rgb_image, detection_result):
             landmark_list=face_landmarks,
             connections=FACEMESH_TESSELATION,
             landmark_drawing_spec=None,
-            connection_drawing_spec=get_default_face_mesh_tesselation_style(),
+            connection_drawing_spec=DrawingSpec(
+                color=(192, 192, 192), thickness=1, circle_radius=0
+            ),
         )
         draw_landmarks(
             image=annotated_image,
             landmark_list=face_landmarks,
             connections=FACEMESH_CONTOURS,
             landmark_drawing_spec=None,
-            connection_drawing_spec=get_default_face_mesh_contours_style(),
+            connection_drawing_spec=DrawingSpec(
+                color=(0, 255, 0), thickness=2, circle_radius=0
+            ),
         )
         draw_landmarks(
             image=annotated_image,
             landmark_list=face_landmarks,
             connections=FACEMESH_IRISES,
             landmark_drawing_spec=None,
-            connection_drawing_spec=get_default_face_mesh_iris_connections_style(),
+            connection_drawing_spec=DrawingSpec(
+                color=(0, 0, 255), thickness=1, circle_radius=0
+            ),
         )
         # Additional feature-specific overlays
         draw_landmarks(
@@ -105,7 +107,7 @@ def draw_landmarks_on_image(rgb_image, detection_result):
             connections=FACEMESH_FACE_OVAL,
             landmark_drawing_spec=None,
             connection_drawing_spec=DrawingSpec(
-                color=(0, 255, 0), thickness=2, circle_radius=0
+                color=(0, 255, 0), thickness=1, circle_radius=0
             ),
         )
         draw_landmarks(
