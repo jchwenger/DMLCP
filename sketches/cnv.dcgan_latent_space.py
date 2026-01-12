@@ -47,10 +47,10 @@ n_frames = 100
 # CelebA (requires three channels): https://drive.google.com/file/d/1WBfUkjOtgTX2c2UgFYZY4skjMzDaGi2y/view?usp=sharing
 
 DCGAN_PATH = pathlib.Path(
-    "../python/models/dcgan_mnist/dcgan_mnist_g.iter_0936_scripted.pt"
-    # "../python/models/dcgan_fashion_mnist/dcgan_fashion_mnist_g.iter_2339_scripted.pt"
-    # "../python/models/dcgan_fashion_mnist_redux/dcgan_mnist_g.iter_2340_scripted.pt"
-    # "../python/models/dcgan_celeba/dcgan_celeba_g.iter_6791_scripted.pt"
+    "../notebooks/models/dcgan_mnist/dcgan_mnist_g.iter_0936_scripted.pt"
+    # "../notebooks/models/dcgan_fashion_mnist/dcgan_fashion_mnist_g.iter_2339_scripted.pt"
+    # "../notebooks/models/dcgan_fashion_mnist_redux/dcgan_mnist_g.iter_2340_scripted.pt"
+    # "../notebooks/models/dcgan_celeba/dcgan_celeba_g.iter_6791_scripted.pt"
 )
 
 # Load generator model
