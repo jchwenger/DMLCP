@@ -59,7 +59,11 @@ def setup():
 
 
 def draw():
-    global counter, fps, start_time
+    global fps
+    global result
+    global counter
+    global start_time
+
     background(0)
 
     # Video frame
@@ -70,13 +74,13 @@ def draw():
 
     # Detect objects
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
-    detection_result = detector.detect(mp_image)
+    result = detector.detect(mp_image)
 
     push()
     image(frame)
 
-    if detection_result and detection_result.detections:
-        draw_detections(detection_result.detections)
+    if result and result.detections:
+        draw_detections(result.detections)
 
     if SHOW_FPS:
         if counter % FPS_AVG_FRAME_COUNT == 0:
@@ -86,6 +90,20 @@ def draw():
         draw_fps_label(fps)
 
     pop()
+
+
+def mouse_pressed():
+    global result
+
+    print()
+    # print(result)
+    # print()
+
+    for d in result.detections:
+        # print(d)
+        print(d.bounding_box)
+        for c in d.categories:
+            print(c.category_name, "| score:", c.score)
 
 
 # helpers ------------------------------------------------------------------------

@@ -45,6 +45,8 @@ def setup():
 
 
 def draw():
+    global result
+
     background(0)
 
     # Video frame
@@ -84,6 +86,20 @@ def draw_label(anchor_xy, text_str):
 
     fill(0, 255, 0)
     text(text_str, (x, y))
+
+
+def mouse_pressed():
+    global result
+
+    # print()
+    # print(result)
+    # print()
+    for c in result.classifications:
+        # print(c)
+        # print()
+        for cc in c.categories:
+            # print(cc)
+            print(cc.category_name, "| score:", cc.score)
 
 
 run()

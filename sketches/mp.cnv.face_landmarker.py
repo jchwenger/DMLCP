@@ -67,6 +67,8 @@ def setup():
 
 
 def draw():
+    global result
+
     background(0)
 
     # Video frame
@@ -129,6 +131,26 @@ def draw():
             # draw_connections(pts, FACEMESH_CONTOURS)
 
     pop()
+
+
+def mouse_pressed():
+    global result
+
+    print()
+    # print(result)
+    # print(result.__dict__.keys())
+
+    for f in result.face_landmarks:
+        for ff in f:
+            # print(ff)
+            print(ff.x, ff.y)
+
+    # print(result.face_blendshapes)
+
+    # for b in result.face_blendshapes:
+    #     for bb in b:
+    #         # print(bb)
+    #         print(bb.category_name, "| score:", bb.score)
 
 
 # helpers ------------------------------------------------------------------------

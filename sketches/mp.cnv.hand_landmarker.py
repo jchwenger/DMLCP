@@ -55,6 +55,8 @@ def setup():
 
 
 def draw():
+    global result
+
     background(0)
 
     # Video frame
@@ -90,6 +92,27 @@ def key_pressed(key, mods=None):
     global DRAW_SUBSETS
     if key == "1":
         DRAW_SUBSETS = not DRAW_SUBSETS
+
+
+def mouse_pressed():
+    global result
+
+    print()
+    # print(result)
+    # print()
+
+    handedness = result.handedness
+    # print(handedness)
+
+    for h in handedness:
+        for hh in h:
+            print(hh.display_name, "| score:", hh.score)
+
+    hand_landmarks = result.hand_landmarks
+
+    for l in hand_landmarks:
+        for ll in l:
+            print(ll.x, ll.y)
 
 
 # helpers ------------------------------------------------------------------------
