@@ -7,6 +7,7 @@ from typing import Tuple
 from typing import Mapping
 
 import cv2
+import numpy as np
 
 # --------------------------------------------------------------------------------
 
@@ -44,6 +45,12 @@ def show_fps(
         font_thickness,
     )
 
+
+# convert one face's landmarks to pixel coordinates
+def landmarks_to_px(lms, width, height):
+    return np.array(
+        [[lm.x * width, lm.y * height] for lm in lms], dtype=float
+    )
 
 # --------------------------------------------------------------------------------
 # mediapipe imports

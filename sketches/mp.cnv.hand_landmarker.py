@@ -14,6 +14,7 @@ from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.core import base_options as base_options_module
 
 from utils import ensure_model
+from utils import landmarks_to_px
 
 from utils import HAND_PALM_CONNECTIONS
 from utils import HAND_THUMB_CONNECTIONS
@@ -58,7 +59,7 @@ def draw():
 
     # Video frame
     frame = video.read()
-    frame = np.array(frame)  # uint8 (SRGB)
+    frame = np.array(frame)
 
     push()
     image(frame)
@@ -70,7 +71,7 @@ def draw():
     # Draw each detected hand
     if result and result.hand_landmarks:
         for i, lms in enumerate(result.hand_landmarks):
-            pts = landmarks_to_px(lms)
+            pts = landmarks_to_px(lms, VIDEO_WIDTH, VIDEO_HEIGHT)
 
             # Hand skeleton
             draw_hand(pts, DRAW_SUBSETS)
@@ -94,11 +95,9 @@ def key_pressed(key, mods=None):
 # helpers ------------------------------------------------------------------------
 
 
-def landmarks_to_px(lms):
-    """Convert one hand's landmarks to pixel coordinates in the video space."""
-    return np.array(
-        [[lm.x * VIDEO_HEIGHT, lm.y * VIDEO_WIDTH] for lm in lms], dtype=float
-    )
+def draw_connections(pts, connections):
+    for a, b in connections:
+        line(pts[a], pts[b])
 
 
 def draw_hand(pts, subsets=False):
@@ -128,11 +127,6 @@ def draw_hand(pts, subsets=False):
     fill(0, 200, 255)
     for x, y in pts:
         circle((x, y), 3.8)
-
-
-def draw_connections(pts, connections):
-    for a, b in connections:
-        line(pts[a], pts[b])
 
 
 def handedness_label(result, hand_index):

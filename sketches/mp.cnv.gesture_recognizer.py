@@ -14,6 +14,8 @@ from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.core import base_options as base_options_module
 
 from utils import ensure_model
+from utils import landmarks_to_px
+
 from utils import HAND_PALM_CONNECTIONS
 from utils import HAND_THUMB_CONNECTIONS
 from utils import HAND_INDEX_FINGER_CONNECTIONS
@@ -91,7 +93,7 @@ def draw():
         gesture_list = getattr(result, "gestures", [])
 
         for idx, lms in enumerate(result.hand_landmarks):
-            pts = landmarks_to_px(lms)
+            pts = landmarks_to_px(lms, VIDEO_WIDTH, VIDEO_HEIGHT)
 
             # Landmark overlays
             draw_hand(pts, DRAW_SUBSETS)
@@ -123,11 +125,9 @@ def key_pressed(key, mods=None):
 # helpers ------------------------------------------------------------------------
 
 
-def landmarks_to_px(lms):
-    """Convert one hand's landmarks to pixel coordinates in the video space."""
-    return np.array(
-        [[lm.x * VIDEO_WIDTH, lm.y * VIDEO_HEIGHT] for lm in lms], dtype=float
-    )
+def draw_connections(pts, connections):
+    for a, b in connections:
+        line(pts[a], pts[b])
 
 
 def draw_hand(pts, subsets=False):
@@ -157,11 +157,6 @@ def draw_hand(pts, subsets=False):
     fill(0, 200, 255)
     for x, y in pts:
         circle((x, y), 4.0)
-
-
-def draw_connections(pts, connections):
-    for a, b in connections:
-        line(pts[a], pts[b])
 
 
 def handedness_label(handedness_list, idx):

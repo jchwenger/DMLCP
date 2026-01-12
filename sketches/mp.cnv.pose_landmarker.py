@@ -16,6 +16,7 @@ from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.core import base_options as base_options_module
 
 from utils import ensure_model
+from utils import landmarks_to_px
 
 from utils import POSE_CONNECTIONS
 
@@ -42,7 +43,7 @@ model = vision.PoseLandmarker.create_from_options(options)
 
 # --------------------------------------------------------------------------------
 
-video = VideoInput(1, size=(VIDEO_WIDTH, VIDEO_HEIGHT))
+video = VideoInput(size=(VIDEO_WIDTH, VIDEO_HEIGHT))
 
 
 def setup():
@@ -54,7 +55,7 @@ def draw():
 
     # Video frame
     frame = video.read()
-    frame = np.array(frame)  # uint8 (SRGB)
+    frame = np.array(frame)
 
     push()
     image(frame)
@@ -66,7 +67,7 @@ def draw():
     # Draw each detected person
     if result and result.pose_landmarks:
         for lms in result.pose_landmarks:
-            pts = landmarks_to_px(lms)
+            pts = landmarks_to_px(lms, VIDEO_WIDTH, VIDEO_HEIGHT)
 
             # 1) Connections (white)
             no_fill()
@@ -84,13 +85,6 @@ def draw():
 
 
 # helpers ------------------------------------------------------------------------
-
-
-def landmarks_to_px(lms):
-    """Convert one pose's landmarks to pixel coordinates in the video space."""
-    return np.array(
-        [[lm.x * VIDEO_WIDTH, lm.y * VIDEO_HEIGHT] for lm in lms], dtype=float
-    )
 
 
 def draw_connections(pts, connections):

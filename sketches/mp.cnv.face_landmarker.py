@@ -14,6 +14,7 @@ from mediapipe.tasks.python import vision
 from mediapipe.tasks.python.core import base_options as base_options_module
 
 from utils import ensure_model
+from utils import landmarks_to_px
 
 from utils import FACEMESH_LIPS
 from utils import FACEMESH_NOSE
@@ -87,7 +88,7 @@ def draw():
 
         # Draw each detected face
         for lms in result.face_landmarks:
-            pts = landmarks_to_px(lms)
+            pts = landmarks_to_px(lms, VIDEO_WIDTH, VIDEO_HEIGHT)
 
             no_fill()
 
@@ -131,11 +132,6 @@ def draw():
 
 
 # helpers ------------------------------------------------------------------------
-
-
-# convert one face's landmarks to pixel coordinates
-def landmarks_to_px(lms):
-    return np.array([[lm.x * VIDEO_WIDTH, lm.y * VIDEO_HEIGHT] for lm in lms], dtype=float)
 
 
 # Helper: draw a set of connections
