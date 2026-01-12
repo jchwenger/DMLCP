@@ -55,12 +55,12 @@ segmenter = vision.InteractiveSegmenter.create_from_options(options)
 
 # --------------------------------------------------------------------------------
 
-video_size = 512
-video = VideoInput(1, size=(video_size, video_size))
+VIDEO_SIZE = 512
+video = VideoInput(size=(VIDEO_SIZE, VIDEO_SIZE))
 
 
 def setup():
-    create_canvas(video_size, video_size)
+    create_canvas(VIDEO_SIZE, VIDEO_SIZE)
     text_size(12)
 
 
@@ -111,13 +111,13 @@ def draw():
 
     # Draw to the canvas
     push()
-    scale(width / video_size)
+    scale(width / VIDEO_SIZE)
     image(output_image)
 
     # Selection point indicator
     keypoint_px = (
-        int(KEYPOINT_X * video_size),
-        int(KEYPOINT_Y * video_size),
+        int(KEYPOINT_X * VIDEO_SIZE),
+        int(KEYPOINT_Y * VIDEO_SIZE),
     )
     stroke(0)
     stroke_weight(3)

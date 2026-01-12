@@ -44,8 +44,7 @@ NormalizedKeypoint = containers.keypoint.NormalizedKeypoint
 
 # Display configuration
 WINDOW_NAME = "Interactive Segmentation"
-DESIRED_HEIGHT = 800
-DESIRED_WIDTH = 600
+VIDEO_SIZE = 512
 
 
 # Callback function to select point on mouse click
@@ -86,7 +85,7 @@ while cap.isOpened():
     # Flip frame horizontally (like a mirror)
     frame = cv2.flip(frame, 1)
 
-    resized_frame = cv2.resize(frame, (DESIRED_HEIGHT, DESIRED_WIDTH))
+    resized_frame = cv2.resize(frame, (VIDEO_SIZE, VIDEO_SIZE))
     h, w = resized_frame.shape[:2]
 
     # Convert frame to RGB

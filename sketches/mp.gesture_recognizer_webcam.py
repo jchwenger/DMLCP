@@ -30,8 +30,7 @@ from utils import draw_landmarks
 # --------------------------------------------------------------------------------
 
 WINDOW_NAME = "Gesture Recognition"
-DESIRED_HEIGHT = 800
-DESIRED_WIDTH = 600
+VIDEO_SIZE = 512
 DRAW_SUBSETS = False
 
 MARGIN = 10  # pixels
@@ -246,8 +245,9 @@ print("----------------------------------------")
 
 
 # Open webcam video stream
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
+# reshape window & no GUI
 cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_GUI_NORMAL)
 cv2.setWindowProperty(WINDOW_NAME, cv2.WND_PROP_AUTOSIZE, cv2.WINDOW_AUTOSIZE)
 
@@ -261,7 +261,7 @@ while cap.isOpened():
     frame = cv2.flip(frame, 1)
 
     # Resize the frame to the desired dimensions
-    resized_frame = cv2.resize(frame, (DESIRED_HEIGHT, DESIRED_WIDTH))
+    resized_frame = cv2.resize(frame, (VIDEO_SIZE, VIDEO_SIZE))
 
     # Convert the frame to RGB and create MediaPipe Image
     rgb_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2RGB)

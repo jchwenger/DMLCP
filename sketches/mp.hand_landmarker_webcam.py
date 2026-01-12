@@ -9,10 +9,6 @@
 # --------------------------------------------------------------------------------
 
 import pathlib
-
-import dataclasses
-from typing import Iterable, Mapping, Optional, Sequence, Tuple, Union
-
 import numpy as np
 
 import cv2
@@ -37,8 +33,8 @@ from utils import HAND_CONNECTIONS
 # --------------------------------------------------------------------------------
 
 WINDOW_NAME = "Hand Detection"
-DESIRED_HEIGHT = 800
-DESIRED_WIDTH = 600
+VIDEO_SIZE = 512
+
 DRAW_SUBSETS = False
 
 MARGIN = 10
@@ -190,10 +186,9 @@ detector = vision.HandLandmarker.create_from_options(options)
 # --------------------------------------------------------------------------------
 
 # Open webcam video stream
-cap = cv2.VideoCapture(1)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+cap = cv2.VideoCapture(0)
 
+# reshape window & no GUI
 cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_GUI_NORMAL)
 cv2.setWindowProperty(WINDOW_NAME, cv2.WND_PROP_AUTOSIZE, cv2.WINDOW_AUTOSIZE)
 
@@ -207,7 +202,7 @@ while cap.isOpened():
     frame = cv2.flip(frame, 1)
 
     # Resize the frame to the desired dimensions
-    resized_frame = cv2.resize(frame, (DESIRED_HEIGHT, DESIRED_WIDTH))
+    resized_frame = cv2.resize(frame, (VIDEO_SIZE, VIDEO_SIZE))
 
     # Convert the frame to RGB and create MediaPipe Image
     rgb_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2RGB)

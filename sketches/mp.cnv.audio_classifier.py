@@ -23,6 +23,8 @@ from py5canvas.canvas import hsv_to_rgb
 
 # --------------------------------------------------------------------------------
 
+VIDEO_SIZE = 512
+
 # Audio recording parameters
 SAMPLE_RATE = 16000  # Hz
 NUM_CHANNELS = 1
@@ -128,7 +130,7 @@ audio_record.start_recording()
 
 
 def setup():
-    create_canvas(800, 600)
+    create_canvas(VIDEO_SIZE, VIDEO_SIZE)
     text_size(14)
     frame_rate(30)
 

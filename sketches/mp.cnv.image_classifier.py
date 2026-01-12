@@ -32,12 +32,12 @@ classifier = vision.ImageClassifier.create_from_options(options)
 
 # --------------------------------------------------------------------------------
 
-video_size = 512
-video = VideoInput(1, size=(video_size, video_size))
+VIDEO_SIZE = 512
+video = VideoInput(size=(VIDEO_SIZE, VIDEO_SIZE))
 
 
 def setup():
-    create_canvas(video_size, video_size)
+    create_canvas(VIDEO_SIZE, VIDEO_SIZE)
     text_size(14)
 
 
@@ -52,7 +52,7 @@ def draw():
     classification_result = classifier.classify(mp_image)
 
     push()
-    scale(width / video_size)
+    scale(width / VIDEO_SIZE)
     image(frame)
 
     # Draw classification label (top result)

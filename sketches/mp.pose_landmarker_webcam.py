@@ -36,8 +36,7 @@ from utils import POSE_CONNECTIONS
 SEGMENTATION_MODE = 0
 
 WINDOW_NAME = "Pose Detection"
-DESIRED_HEIGHT = 800
-DESIRED_WIDTH = 600
+WINDOW_SIZE = 512
 
 GREEN_COLOR = (0, 128, 0)
 BLUE_COLOR = (255, 0, 0)
@@ -84,8 +83,9 @@ detector = vision.PoseLandmarker.create_from_options(options)
 # --------------------------------------------------------------------------------
 
 # Open webcam video stream
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
+# reshape window & no GUI
 cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_GUI_NORMAL)
 cv2.setWindowProperty(WINDOW_NAME, cv2.WND_PROP_AUTOSIZE, cv2.WINDOW_AUTOSIZE)
 
@@ -99,7 +99,7 @@ while cap.isOpened():
     frame = cv2.flip(frame, 1)
 
     # Resize the frame to the desired dimensions
-    resized_frame = cv2.resize(frame, (DESIRED_HEIGHT, DESIRED_WIDTH))
+    resized_frame = cv2.resize(frame, (VIDEO_SIZE, VIDEO_SIZE))
 
     # Convert frame to RGB format (as expected by MediaPipe)
     rgb_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2RGB)

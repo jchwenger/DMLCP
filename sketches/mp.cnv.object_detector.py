@@ -44,15 +44,15 @@ detector = vision.ObjectDetector.create_from_options(options)
 
 # --------------------------------------------------------------------------------
 
-video_size = 512
-video = VideoInput(1, size=(video_size, video_size))
+VIDEO_SIZE = 512
+video = VideoInput(size=(VIDEO_SIZE, VIDEO_SIZE))
 
 counter, fps = 0, 0.0
 start_time = time.time()
 
 
 def setup():
-    create_canvas(video_size, video_size)
+    create_canvas(VIDEO_SIZE, VIDEO_SIZE)
     text_size(12)
 
 
@@ -71,7 +71,7 @@ def draw():
     detection_result = detector.detect(mp_image)
 
     push()
-    scale(width / video_size)
+    scale(width / VIDEO_SIZE)
     image(frame)
 
     if detection_result and detection_result.detections:

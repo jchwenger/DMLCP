@@ -54,12 +54,12 @@ model = vision.FaceLandmarker.create_from_options(options)
 
 # --------------------------------------------------------------------------------
 
-video_size = 512
-video = VideoInput(1, size=(video_size, video_size))
+VIDEO_SIZE = 512
+video = VideoInput(size=(VIDEO_SIZE, VIDEO_SIZE))
 
 
 def setup():
-    create_canvas(video_size, video_size)
+    create_canvas(VIDEO_SIZE, VIDEO_SIZE)
 
 
 def draw():
@@ -71,7 +71,7 @@ def draw():
     frame = np.array(frame)
 
     push()
-    scale(width / video_size)
+    scale(width / VIDEO_SIZE)
     image(frame)
 
     # Convert the frame to RGB and create MediaPipe Image
@@ -133,7 +133,7 @@ def draw():
 
 # convert one face's landmarks to pixel coordinates
 def landmarks_to_px(lms):
-    return np.array([[lm.x * video_size, lm.y * video_size] for lm in lms], dtype=float)
+    return np.array([[lm.x * VIDEO_SIZE, lm.y * VIDEO_SIZE] for lm in lms], dtype=float)
 
 
 # Helper: draw a set of connections

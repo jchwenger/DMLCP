@@ -19,7 +19,7 @@ device = (
 print(f"Using {device} device")
 
 # Output size
-w, h = 512, 512
+VIDEO_SIZE = 512
 
 # Make sure this matches the latent dimension you trained on
 latent_dim = 100
@@ -89,7 +89,7 @@ def generate(model):
 
 
 def setup():
-    create_canvas(w, h)
+    create_canvas(VIDEO_SIZE, VIDEO_SIZE)
     frame_rate(60)
 
 

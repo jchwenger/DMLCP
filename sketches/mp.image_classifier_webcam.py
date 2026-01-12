@@ -23,8 +23,7 @@ from utils import ensure_model
 # --------------------------------------------------------------------------------
 
 WINDOW_NAME = "Image Classification"
-DESIRED_HEIGHT = 800
-DESIRED_WIDTH = 600
+VIDEO_SIZE = 512
 
 # Path to the model file
 model_path = pathlib.Path("models/efficientnet_lite0.tflite")
@@ -40,9 +39,9 @@ classifier = vision.ImageClassifier.create_from_options(options)
 # --------------------------------------------------------------------------------
 
 # Open webcam video stream
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
-# reshape window
+# reshape window & no GUI
 cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_GUI_NORMAL)
 cv2.setWindowProperty(WINDOW_NAME, cv2.WND_PROP_AUTOSIZE, cv2.WINDOW_AUTOSIZE)
 
@@ -56,7 +55,7 @@ while cap.isOpened():
     frame = cv2.flip(frame, 1)
 
     # Resize the frame to the desired dimensions
-    resized_frame = cv2.resize(frame, (DESIRED_HEIGHT, DESIRED_WIDTH))
+    resized_frame = cv2.resize(frame, (VIDEO_SIZE, VIDEO_SIZE))
 
     # Convert the frame to RGB format (as expected by MediaPipe)
     rgb_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2RGB)

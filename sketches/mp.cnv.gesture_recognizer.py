@@ -57,14 +57,14 @@ print(
 )
 print("----------------------------------------")
 
-video_size = 512
-video = VideoInput(1, size=(video_size, video_size), flipped=True)
+VIDEO_SIZE = 512
+video = VideoInput(size=(VIDEO_SIZE, VIDEO_SIZE), flipped=True)
 
 DRAW_SUBSETS = False
 
 
 def setup():
-    create_canvas(video_size, video_size)
+    create_canvas(VIDEO_SIZE, VIDEO_SIZE)
     text_size(12)
 
 
@@ -79,7 +79,7 @@ def draw():
     result = recognizer.recognize(mp_image)
 
     push()
-    scale(width / video_size)
+    scale(width / VIDEO_SIZE)
     image(frame)
 
     if result and getattr(result, "hand_landmarks", None):
@@ -121,7 +121,7 @@ def key_pressed(key, mods=None):
 
 def landmarks_to_px(lms):
     """Convert one hand's landmarks to pixel coordinates in the video space."""
-    return np.array([[lm.x * video_size, lm.y * video_size] for lm in lms], dtype=float)
+    return np.array([[lm.x * VIDEO_SIZE, lm.y * VIDEO_SIZE] for lm in lms], dtype=float)
 
 
 def draw_hand(pts, subsets=False):
