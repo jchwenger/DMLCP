@@ -5,9 +5,11 @@ channels:
 dependencies:
   - python
   - pip
+  - numpy<2
   - pytorch
   - torchvision
   - torchaudio
+  - pysoundfile
   - jupyter
   - matplotlib
   - opencv
