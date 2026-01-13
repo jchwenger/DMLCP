@@ -11,13 +11,13 @@ On Windows, I recommend allowing Miniforge to be your primary Python provider an
 Once this is installed, in a terminal, install the course dependencies:
 
 ```bash
-mamba env create -f environment.yml
+mamba env create -f environment.yaml
 ```
 
 If you need to update the environment using the YAML file, do this:
 
 ```bash
-mamba env update -f environment.yml
+mamba env update -f environment.yaml
 ```
 
 You can obviously add dependencies manually, but **always** check that your environment is active: see **Checking your installation**.
