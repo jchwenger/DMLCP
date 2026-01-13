@@ -54,14 +54,14 @@ def draw():
 
     # Classify the frame
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
-    classification_result = classifier.classify(mp_image)
+    result = classifier.classify(mp_image)
 
     push()
     image(frame)
 
     # Draw classification label (top result)
-    if classification_result and classification_result.classifications:
-        top_category = classification_result.classifications[0].categories[0]
+    if result and result.classifications:
+        top_category = result.classifications[0].categories[0]
         label = f"{top_category.category_name} ({top_category.score:.2f})"
         draw_label((12, 20), label)
 
