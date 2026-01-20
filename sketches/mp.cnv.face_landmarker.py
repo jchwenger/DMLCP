@@ -130,6 +130,9 @@ def draw():
             # stroke(0, 255, 0)
             # draw_connections(pts, FACEMESH_CONTOURS)
 
+            # # bounding box
+            bbox_from_landmarks(pts)
+
     pop()
 
 
@@ -148,7 +151,7 @@ def mouse_pressed():
             # print(ff)
             print(ff.x, ff.y)
 
-    # blendshapes: detecting various face 'gestures' 
+    # blendshapes: detecting various face 'gestures'
 
     # print(result.face_blendshapes)
 
@@ -164,10 +167,25 @@ def mouse_pressed():
 # helpers ------------------------------------------------------------------------
 
 
-# Helper: draw a set of connections
+# draw a set of connections
 def draw_connections(pts, connections):
     for i, j in connections:
         line(pts[i], pts[j])
+
+
+# draw bounding box
+def bbox_from_landmarks(landmarks):
+    # select all xs and all ys
+    xs = landmarks[:, 0]
+    ys = landmarks[:, 1]
+    # extract the mins and maxs
+    x_min, x_max = min(xs), max(xs)
+    y_min, y_max = min(ys), max(ys)
+    # rectangle using two corners using min & max
+    push()
+    rect_mode("corners")
+    rect(x_min, y_min, x_max, y_max)
+    pop()
 
 
 run()
