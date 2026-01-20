@@ -51,6 +51,8 @@ def setup():
 
 
 def draw():
+    global result
+
     background(0)
 
     # Video frame
@@ -82,6 +84,22 @@ def draw():
                 circle((x, y), 4.0)
 
     pop()  # close the push() done before drawing the frame
+
+
+def mouse_pressed():
+    global result
+
+    print()
+    # print(result)
+    # print(result.__dict__.keys())
+    # print()
+
+    for pl in result.pose_landmarks:
+        # print(pl)
+        for ppl in pl:
+            print(
+                f"x: {ppl.x:.2f}, y: {ppl.y:.2f}, visibility: {ppl.visibility:.2f}, presence: {ppl.presence:.2f}, name: {ppl.name}"
+            )
 
 
 # helpers ------------------------------------------------------------------------
