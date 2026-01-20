@@ -84,6 +84,8 @@ def draw():
             if label:
                 draw_floating_label(idx_tip, label)
 
+            bbox_from_landmarks(pts)
+
     pop()
 
 
@@ -189,6 +191,24 @@ def draw_floating_label(anchor_xy, text_str):
     # Text
     fill(255)
     text(text_str, (x, y))
+    pop()
+
+
+# draw bounding box
+def bbox_from_landmarks(landmarks):
+    # print(landmarks)
+    # select all xs and all ys
+    xs = landmarks[:, 0]
+    ys = landmarks[:, 1]
+    # extract the mins and maxs
+    x_min, x_max = min(xs), max(xs)
+    y_min, y_max = min(ys), max(ys)
+    # rectangle using two corners using min & max
+    push()
+    no_fill()
+    stroke(255)
+    rect_mode("corners")
+    rect(x_min, y_min, x_max, y_max)
     pop()
 
 
