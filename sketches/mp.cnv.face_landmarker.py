@@ -138,17 +138,25 @@ def mouse_pressed():
 
     print()
     # print(result)
+
     # print(result.__dict__.keys())
+
+    # the landmarks
 
     for f in result.face_landmarks:
         for ff in f:
             # print(ff)
             print(ff.x, ff.y)
 
+    # blendshapes: detecting various face 'gestures' 
+
     # print(result.face_blendshapes)
 
     # for b in result.face_blendshapes:
-    #     for bb in b:
+    #     # want the facial expression with the highest score?
+    #     # sort the array (using a lambda function)
+    #     b_sorted = sorted(b, key=lambda b: b.score)
+    #     for bb in b_sorted:
     #         # print(bb)
     #         print(bb.category_name, "| score:", bb.score)
 
