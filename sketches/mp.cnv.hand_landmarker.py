@@ -84,7 +84,7 @@ def draw():
             if label:
                 draw_floating_label(idx_tip, label)
 
-            bbox_from_landmarks(pts)
+            # bbox_from_landmarks(pts)
 
     pop()
 

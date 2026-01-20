@@ -131,7 +131,7 @@ def draw():
             # draw_connections(pts, FACEMESH_CONTOURS)
 
             # # bounding box
-            bbox_from_landmarks(pts)
+            # bbox_from_landmarks(pts)
 
     pop()
 
