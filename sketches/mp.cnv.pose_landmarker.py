@@ -83,6 +83,8 @@ def draw():
             for x, y in pts:
                 circle((x, y), 4.0)
 
+            # bbox_from_landmarks(pts)
+
     pop()  # close the push() done before drawing the frame
 
 
@@ -109,6 +111,22 @@ def draw_connections(pts, connections):
     for a, b in connections:
         line(pts[a], pts[b])
 
+# draw bounding box
+def bbox_from_landmarks(landmarks):
+    # print(landmarks)
+    # select all xs and all ys
+    xs = landmarks[:, 0]
+    ys = landmarks[:, 1]
+    # extract the mins and maxs
+    x_min, x_max = min(xs), max(xs)
+    y_min, y_max = min(ys), max(ys)
+    # rectangle using two corners using min & max
+    push()
+    no_fill()
+    stroke(255)
+    rect_mode("corners")
+    rect(x_min, y_min, x_max, y_max)
+    pop()
 
 run()
 
