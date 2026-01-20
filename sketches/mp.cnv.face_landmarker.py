@@ -82,7 +82,7 @@ def draw():
     # Convert the frame to RGB and create MediaPipe Image
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
 
-    # # Detect face landmarks in the frame
+    # Detect face landmarks in the frame
     result = model.detect(mp_image)
 
     if result and result.face_landmarks:
