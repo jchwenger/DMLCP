@@ -24,3 +24,6 @@ venv
 
 # models
 **/models
+
+# vscode
+**/.vscode
