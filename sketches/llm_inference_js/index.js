@@ -1,5 +1,7 @@
 // Modified from here:
 // https://github.com/google-ai-edge/mediapipe-samples/tree/main/examples/llm_inference/js
+// See also this:
+// https://chatgpt.com/share/69779cba-222c-8005-aeb2-d319bb36d81c
 
 // ---------------------------------------------------------------------------------------- //
 
@@ -19,13 +21,26 @@
 
 // ---------------------------------------------------------------------------------------- //
 
-import {FilesetResolver, LlmInference} from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai';
+import { FilesetResolver, LlmInference } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai';
+// Handle markdown
+import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
+
+/* Update the file name */
+const modelFileName = 'gemma3-1b-it-int4.task';
 
 const input = document.getElementById('input');
 const output = document.getElementById('output');
 const submit = document.getElementById('submit');
 
-const modelFileName = 'gemma-2b-it-gpu-int4.bin'; /* Update the file name */
+// ctrl+enter to send message
+input.addEventListener("keydown", (e) => {
+  if (e.ctrlKey && e.key === "Enter") {
+    if (input.value.trim() !== "" && !submit.disabled) {
+      e.preventDefault(); // avoid newline
+      submit.click();
+    }
+  }
+});
 
 /**
  * Display newly generated partial results to the output text box.
@@ -33,11 +48,16 @@ const modelFileName = 'gemma-2b-it-gpu-int4.bin'; /* Update the file name */
 function displayPartialResults(partialResults, complete) {
   input.value = "";
   const lastP = output.lastChild;
-  lastP.innerText += partialResults;
+
+  // store raw markdown on the element
+  lastP._md = (lastP._md || "") + partialResults;
+
+  // render markdown → html
+  lastP.innerHTML = marked.parse(lastP._md);
 
   if (complete) {
-    if (!lastP.textContent) {
-      lastP.textContent = '(No reply...)';
+    if (!lastP.textContent.trim()) {
+      lastP.textContent = "(No reply...)";
     }
     submit.disabled = false;
   }
@@ -53,6 +73,12 @@ async function runDemo() {
 
   submit.onclick = () => {
 
+    input.value = input.value.trim();
+
+    console.log(input.value);
+    // don't process empty
+    if (input.value.length == 0) return;
+
     const p1 = document.createElement("p");
     p1.innerText = input.value;
     p1.classList += "bubble right";
@@ -67,20 +93,20 @@ async function runDemo() {
 
   };
 
+
   submit.value = 'Loading model...'
   LlmInference
       .createFromOptions(genaiFileset, {
         baseOptions: {modelAssetPath: modelFileName},
-        // maxTokens: 512,  // The maximum number of tokens (input tokens + output
-        //                  // tokens) the model handles.
-        // randomSeed: 1,   // The random seed used during text generation.
-        // topK: 1,  // The number of tokens the model considers at each step of
-        //           // generation. Limits predictions to the top k most-probable
-        //           // tokens. Setting randomSeed is required for this to make
-        //           // effects.
-        // temperature:
-        //     1.0,  // The amount of randomness introduced during generation.
-        //           // Setting randomSeed is required for this to make effects.
+        maxTokens: 1280,      // The maximum number of tokens (input tokens + output
+                              // tokens) the model handles.
+        // randomSeed: 1,     // The random seed used during text generation.
+        // topK: 40,          // The number of tokens the model considers at each step of
+        //                    // generation. Limits predictions to the top k most-probable
+        //                    // tokens. Setting randomSeed is required for this to make
+        //                    // effects.
+        // temperature: 1.0,  // The amount of randomness introduced during generation.
+        //                    // Setting randomSeed is required for this to make effects.
       })
       .then(llm => {
         llmInference = llm;
