@@ -3,28 +3,38 @@ import p5 from 'https://cdn.jsdelivr.net/npm/p5@1.9.1/+esm';
 
 // Import FilesetResolver and LlmInference from MediaPipe Tasks GenAI
 import { FilesetResolver, LlmInference } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai';
+// Handle markdown
+import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
+
+// See here: https://chatgpt.com/share/69779cba-222c-8005-aeb2-d319bb36d81c
+function stripMarkdown(md) {
+  const html = marked.parse(md);
+  const tmp = document.createElement("div");
+  tmp.innerHTML = html;
+  return tmp.textContent || "";
+}
 
 new p5((sketch) => {
   let inputTextArea;
   let submitButton;
+  let rawMarkdown = '';
   let generatedText = '';
 
-  const modelFileName = 'gemma-2b-it-gpu-int4.bin'; // Update the file name as needed
+  const modelFileName = 'gemma3-1b-it-int4.task'; // Update the file name as needed
   let llmInference;
 
   /**
    * Display newly generated partial results in the output text area.
    */
-
   function displayPartialResults(partialResults, complete) {
 
     // Append the new partial results to the generatedText
-    generatedText += partialResults;
+    rawMarkdown += partialResults;
+    // console.log(rawMarkdown);
+
+    generatedText = stripMarkdown(rawMarkdown) || "(No answer...)";
 
     if (complete) {
-      if (!generatedText) {
-        generatedText = '(No answer...)';
-      }
       submitButton.disabled = false;
     }
   }
@@ -56,6 +66,16 @@ new p5((sketch) => {
     inputTextArea.id = "input";
     inputTextArea.placeholder = "Input text here and the response will appear in the sketch...";
 
+    // ctrl+enter to send text
+    inputTextArea.addEventListener("keydown", (e) => {
+      if (e.ctrlKey && e.key === "Enter") {
+        if (inputTextArea.value.trim() !== "" && !submitButton.disabled) {
+          e.preventDefault();
+          submitButton.click();
+        }
+      }
+    });
+
     // Create Submit button
     submitButton = document.createElement('button');
     submitButton.id = "input-button";
@@ -85,6 +105,7 @@ new p5((sketch) => {
         return LlmInference.createFromOptions(genaiFileset, {
           baseOptions: { modelAssetPath: modelFileName },
           // Add additional options here if needed
+          // (See ../llm_inference_js/index.js for an example)
         });
       })
       .then(llm => {
