@@ -41,37 +41,40 @@ def predict(message, history):
     # Start with the system message, then extend with previous turns,
     # then append the newest user message.
 
+    # print("history:")
     # print(history)
-    # breakpoint()
+    # print()
 
     messages = []
 
     if SYSTEM:
         messages.append({"role": "system", "content": SYSTEM})
 
-    # `history` from Gradio ChatInterface(type="messages") is already
-    # a list of {"role": ..., "content": ...} dicts.
+    # Gradio ChatInterface(type="messages") history: list of {role, content}.
+    # content can be a string (text-only) or a list of parts (e.g. {type, text}).
+    # We normalize to Ollama format: {role: "user"|"assistant"|"system", content: str}.
     if history:
         for turn in history:
-            # print(turn)
+            # print(f"{turn}")
             role = turn.get("role", "user")
             content = turn.get("content", [])
-            # the messages are actually subdivided into lists of various types
-            # TODO: in a more advanced app, one could handle images or files!
+            # Various kinds of content (text, image, file path...)
+            # TODO: develop this into a full multimodal chatbot, allowing users
+            # to upload images, files, etc.
             for subcontent in content:
-                # print("subcontent:", subcontent)
-                content_type = str(turn.get("type", ""))
-                if content_type == "text":
-                    content_text = str(turn.get("text", ""))
-                    messages.append({"role": role, "text": content_text})
+                # print(f" - {subcontent}")
+                # Get the message type
+                subcontent_type = subcontent.get("type", "")
+                # If it is text, add to our messages
+                if subcontent_type == "text":
+                    content_text = subcontent.get("text", "")
+                    messages.append({"role": role, "content": content_text})
 
-    # breakpoint()
-    messages.append({"role": "user", "content": str(message)})
+    messages.append({"role": "user", "content": message})
 
-    # print()
+    # print("messages:")
     # print(messages)
     # print()
-    # breakpoint()
 
     # Call Ollama with streaming enabled so we can yield partial tokens.
     stream = ollama.chat(
