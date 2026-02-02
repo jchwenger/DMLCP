@@ -19,6 +19,9 @@ from transformers import TextIteratorStreamer
 # MODEL_ID = "google/gemma-3-270m-it"
 MODEL_ID = "Qwen/Qwen3-0.6B"
 
+# The overall 'directive' for our bot, see below
+SYSTEM = "You are a helpful, concise assistant."
+
 device = (
     "cuda"
     if torch.cuda.is_available()
@@ -55,19 +58,20 @@ def predict(message, history):
     - We append the latest user message, then build a chat template for Qwen.
     """
 
-    print(history)
+    # print(history)
 
     # Make sure we don't mutate Gradio's history list in-place
     conversation = history + [{"role": "user", "content": message}]
 
     # Optionally prepend a system prompt; this also helps some Qwen templates.
-    conversation = [
-        {
-            "role": "system",
-            "content": "You are a helpful, concise assistant.",
-        },
-        *conversation,
-    ]
+    if SYSTEM:
+        conversation = [
+            {
+                "role": "system",
+                "content": SYSTEM,
+            },
+            *conversation,
+        ]
 
     # Use Qwen's chat template and add a generation prompt so the model knows
     # it should now produce the assistant's reply.
@@ -116,7 +120,7 @@ def predict(message, history):
     # Streamed parsing of the `<think>...</think>` block.
     # As soon as we see `<think>` in the stream, we start treating
     # everything that follows as "reasoning" until we encounter `</think>`.
-    full_answer = ""
+    generated = ""
     in_think = False
 
     for new_text in streamer:
@@ -126,22 +130,22 @@ def predict(message, history):
         # Wrap thinking in a p with dedicated html
         next_text_stripped = new_text.strip()
         if next_text_stripped == "<think>":
-            full_answer += "<p style='color:#777; font-size: 12px; font-style:italic;'>"
+            generated += "<p style='color:#777; font-size: 12px; font-style:italic;'>"
             in_think = True
             continue
         if next_text_stripped == "</think>":
-            full_answer += "</p>"
+            generated += "</p>"
             in_think = False
             continue
 
-        full_answer += new_text
+        generated += new_text
 
         if in_think:
             # If within thinking tags, temporarily close the div for coherence
-            yield full_answer + "</p>"
+            yield generated + "</p>"
         else:
             # The thinking is over, the tag is closed
-            yield full_answer
+            yield generated
 
     # Ensure the generation thread is finished before returning.
     thread.join()
