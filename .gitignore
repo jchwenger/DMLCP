@@ -24,6 +24,12 @@ venv
 
 # models
 **/models
+**/*.task
+**/*.tflite
+**/*.bin
 
 # vscode
 **/.vscode
+
+# ruff
+**/.ruff_cache

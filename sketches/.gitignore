@@ -1,11 +1,3 @@
-# models
-**/*.task
-**/*.tflite
-**/*.bin
-
-# ruff
-.ruff_cache
-
 # mediapipe & py5canvas clone for search & debug
 mediapipe
 mediapipe-samples
