@@ -29,3 +29,4 @@ dependencies:
     - strip-markdown
     - py5canvas
     - mediapipe
+    - bitsandbytes
