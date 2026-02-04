@@ -1,6 +1,10 @@
 import ollama
 import gradio as gr
 
+# TODO: Render markdown properly.
+#       Add an option to make the thinking visible or not? (There might be
+#       more creative ways to handle that...)
+
 # Name of the Ollama model to use. Change this to any model
 # you have available in your local Ollama install:
 # MODEL_ID = "gemma3:270m"

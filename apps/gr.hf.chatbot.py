@@ -9,6 +9,10 @@ from transformers import AutoModelForCausalLM
 from transformers import TextIteratorStreamer
 # from transformers import BitsAndBytesConfig
 
+# TODO: Render markdown properly.
+#       Add an option to make the thinking visible or not? (There might be
+#       more creative ways to handle that...)
+
 # BEWARE: this app will only work with 'chat' models (that have a
 #         `.chat_template` in their `tokenizer` – you can check that
 #         Qwen3-06B has one: https://huggingface.co/Qwen/Qwen3-0.6B/blob/main/tokenizer_config.json)
