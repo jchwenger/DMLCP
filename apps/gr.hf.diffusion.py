@@ -61,7 +61,7 @@ def generate_image(
     for side, name in ((w, "width"), (h, "height")):
         if side < 16 or side > 1024 or side % 8 != 0:
             raise gr.Error(
-                f"{name.capitalize()} must be between 128 and 1024 pixels "
+                f"{name.capitalize()} must be between 16 and 1024 pixels "
                 "and divisible by 8 (e.g., 256, 384, 512, 640, 768, 896, 1024)."
             )
 
