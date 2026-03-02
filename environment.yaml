@@ -25,6 +25,7 @@ dependencies:
   - transformers
   - diffusers
   - accelerate
+  - imageio-ffmpeg
   - pip:
     - strip-markdown
     - py5canvas
